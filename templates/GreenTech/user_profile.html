@@ -1,0 +1,214 @@
+{% extends 'GreenTech/base.html' %}
+
+{% block title %}My Profile - Green Events & Volunteering Portal{% endblock %}
+
+{% block content %}
+<!-- Profile Header -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-3 text-center">
+                {% if profile.profile_picture %}
+                    <img src="{{ profile.profile_picture.url }}" class="rounded-circle img-fluid" style="width: 150px; height: 150px; object-fit: cover;" alt="Profile Picture">
+                {% else %}
+                    <div class="rounded-circle bg-success d-flex align-items-center justify-content-center mx-auto" style="width: 150px; height: 150px;">
+                        <i class="bi bi-person-fill text-white" style="font-size: 4rem;"></i>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="col-md-9">
+                <h1 class="fw-bold">{{ user.get_full_name|default:user.username }}</h1>
+                <p class="text-muted mb-3">Member since {{ user.date_joined|date:"F Y" }}</p>
+                
+                <div class="row">
+                    <div class="col-md-4 mb-2">
+                        <i class="bi bi-geo-alt text-success me-2"></i>
+                        <span class="text-muted">{{ profile.address|default:"Address not provided" }}</span>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <i class="bi bi-telephone text-success me-2"></i>
+                        <span class="text-muted">{{ profile.phone_number|default:"Phone not provided" }}</span>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <i class="bi bi-calendar text-success me-2"></i>
+                        <span class="text-muted">{{ profile.age|default:"Age not provided" }} years old</span>
+                    </div>
+                </div>
+                
+                {% if profile.bio %}
+                    <p class="mt-3">{{ profile.bio }}</p>
+                {% endif %}
+                
+                <a href="{% url 'edit_profile' %}" class="btn btn-outline-success">
+                    <i class="bi bi-pencil me-2"></i>Edit Profile
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Volunteering Statistics -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-md-4">
+                <div class="card stats-card h-100">
+                    <div class="card-body">
+                        <i class="bi bi-calendar-check text-success" style="font-size: 3rem;"></i>
+                        <h3 class="mt-3">{{ upcoming_registrations.count }}</h3>
+                        <p class="text-muted">Upcoming Events</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card stats-card h-100">
+                    <div class="card-body">
+                        <i class="bi bi-calendar-event text-success" style="font-size: 3rem;"></i>
+                        <h3 class="mt-3">{{ past_registrations.count }}</h3>
+                        <p class="text-muted">Past Events</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card stats-card h-100">
+                    <div class="card-body">
+                        <i class="bi bi-award text-success" style="font-size: 3rem;"></i>
+                        <h3 class="mt-3">{{ past_registrations.count|add:upcoming_registrations.count }}</h3>
+                        <p class="text-muted">Total Events</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Upcoming Events -->
+{% if upcoming_registrations %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="fw-bold mb-4">Upcoming Events</h2>
+        <div class="row">
+            {% for registration in upcoming_registrations %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card event-card h-100">
+                        {% if registration.event.image %}
+                            <img src="{{ registration.event.image.url }}" class="card-img-top" alt="{{ registration.event.title }}" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                            <div class="card-img-top bg-success d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <i class="bi bi-tree-fill text-white" style="font-size: 3rem;"></i>
+                            </div>
+                        {% endif %}
+                        
+                        <span class="badge bg-primary event-type-badge">{{ registration.event.get_event_type_display }}</span>
+                        
+                        <div class="card-body">
+                            <h5 class="card-title">{{ registration.event.title }}</h5>
+                            <p class="card-text text-muted">{{ registration.event.description|truncatewords:15 }}</p>
+                            
+                            <div class="row text-muted small mb-3">
+                                <div class="col-6">
+                                    <i class="bi bi-calendar me-1"></i>{{ registration.event.date|date:"M d, Y" }}
+                                </div>
+                                <div class="col-6">
+                                    <i class="bi bi-clock me-1"></i>{{ registration.event.start_time|time:"g:i A" }}
+                                </div>
+                            </div>
+                            
+                            <div class="row text-muted small mb-3">
+                                <div class="col-6">
+                                    <i class="bi bi-geo-alt me-1"></i>{{ registration.event.location }}
+                                </div>
+                                <div class="col-6">
+                                    <i class="bi bi-calendar-plus me-1"></i>Registered {{ registration.registered_at|date:"M d" }}
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <a href="{% url 'event_detail' registration.event.id %}" class="btn btn-outline-success">
+                                    <i class="bi bi-info-circle me-2"></i>View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Past Events -->
+{% if past_registrations %}
+<section class="py-5">
+    <div class="container">
+        <h2 class="fw-bold mb-4">Past Events</h2>
+        <div class="row">
+            {% for registration in past_registrations %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card event-card h-100">
+                        {% if registration.event.image %}
+                            <img src="{{ registration.event.image.url }}" class="card-img-top" alt="{{ registration.event.title }}" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                            <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <i class="bi bi-tree-fill text-white" style="font-size: 3rem;"></i>
+                            </div>
+                        {% endif %}
+                        
+                        <span class="badge bg-secondary event-type-badge">{{ registration.event.get_event_type_display }}</span>
+                        
+                        <div class="card-body">
+                            <h5 class="card-title">{{ registration.event.title }}</h5>
+                            <p class="card-text text-muted">{{ registration.event.description|truncatewords:15 }}</p>
+                            
+                            <div class="row text-muted small mb-3">
+                                <div class="col-6">
+                                    <i class="bi bi-calendar me-1"></i>{{ registration.event.date|date:"M d, Y" }}
+                                </div>
+                                <div class="col-6">
+                                    <i class="bi bi-clock me-1"></i>{{ registration.event.start_time|time:"g:i A" }}
+                                </div>
+                            </div>
+                            
+                            <div class="row text-muted small mb-3">
+                                <div class="col-6">
+                                    <i class="bi bi-geo-alt me-1"></i>{{ registration.event.location }}
+                                </div>
+                                <div class="col-6">
+                                    {% if registration.attended %}
+                                        <i class="bi bi-check-circle text-success me-1"></i>Attended
+                                    {% else %}
+                                        <i class="bi bi-x-circle text-danger me-1"></i>Missed
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <a href="{% url 'event_detail' registration.event.id %}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-info-circle me-2"></i>View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- No Events Message -->
+{% if not upcoming_registrations and not past_registrations %}
+<section class="py-5">
+    <div class="container">
+        <div class="text-center">
+            <i class="bi bi-calendar-x text-muted" style="font-size: 4rem;"></i>
+            <h3 class="mt-3 text-muted">No Events Yet</h3>
+            <p class="text-muted">You haven't registered for any events yet. Start exploring and join our community!</p>
+            <a href="{% url 'events' %}" class="btn btn-green">
+                <i class="bi bi-calendar-event me-2"></i>Browse Events
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %} 

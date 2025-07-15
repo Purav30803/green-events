@@ -1,0 +1,185 @@
+{% extends 'GreenTech/base.html' %}
+
+{% block title %}Events - Green Events & Volunteering Portal{% endblock %}
+
+{% block content %}
+<!-- Header Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <h1 class="fw-bold">Discover Events</h1>
+                <p class="lead text-muted">Find local eco-friendly events and volunteering opportunities near you</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Filters Section -->
+<section class="py-4 border-bottom">
+    <div class="container">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label for="event_type" class="form-label">Event Type</label>
+                <select name="event_type" id="event_type" class="form-select">
+                    <option value="">All Types</option>
+                    {% for value, label in event_types %}
+                        <option value="{{ value }}" {% if current_filters.event_type == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="col-md-3">
+                <label for="location" class="form-label">Location</label>
+                <input type="text" name="location" id="location" class="form-control" 
+                       placeholder="Enter location" value="{{ current_filters.location }}">
+            </div>
+            
+            <div class="col-md-3">
+                <label for="date" class="form-label">Date</label>
+                <input type="date" name="date" id="date" class="form-control" 
+                       value="{{ current_filters.date }}">
+            </div>
+            
+            <div class="col-md-3 d-flex align-items-end">
+                <div class="d-grid gap-2 w-100">
+                    <button type="submit" class="btn btn-green">
+                        <i class="bi bi-search me-2"></i>Filter Events
+                    </button>
+                </div>
+            </div>
+        </form>
+        
+        {% if current_filters.event_type or current_filters.location or current_filters.date %}
+            <div class="mt-3">
+                <a href="{% url 'events' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-x-circle me-1"></i>Clear Filters
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Events Section -->
+<section class="py-5">
+    <div class="container">
+        {% if page_obj %}
+            <div class="row mb-4">
+                <div class="col">
+                    <p class="text-muted">Showing {{ page_obj.start_index }} - {{ page_obj.end_index }} of {{ page_obj.paginator.count }} events</p>
+                </div>
+            </div>
+            
+            <div class="row">
+                {% for event in page_obj %}
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card event-card h-100">
+                            {% if event.image %}
+                                <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}" style="height: 200px; object-fit: cover;">
+                            {% else %}
+                                <div class="card-img-top bg-success d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <i class="bi bi-tree-fill text-white" style="font-size: 3rem;"></i>
+                                </div>
+                            {% endif %}
+                            
+                            <span class="badge bg-primary event-type-badge">{{ event.get_event_type_display }}</span>
+                            
+                            <div class="card-body">
+                                <h5 class="card-title">{{ event.title }}</h5>
+                                <p class="card-text text-muted">{{ event.description|truncatewords:20 }}</p>
+                                
+                                <div class="row text-muted small mb-3">
+                                    <div class="col-6">
+                                        <i class="bi bi-calendar me-1"></i>{{ event.date|date:"M d, Y" }}
+                                    </div>
+                                    <div class="col-6">
+                                        <i class="bi bi-clock me-1"></i>{{ event.start_time|time:"g:i A" }}
+                                    </div>
+                                </div>
+                                
+                                <div class="row text-muted small mb-3">
+                                    <div class="col-6">
+                                        <i class="bi bi-geo-alt me-1"></i>{{ event.location }}
+                                    </div>
+                                    <div class="col-6">
+                                        <i class="bi bi-people me-1"></i>{{ event.current_participants }}/{{ event.max_participants }}
+                                    </div>
+                                </div>
+                                
+                                {% if event.is_full %}
+                                    <div class="alert alert-warning py-2 mb-3">
+                                        <i class="bi bi-exclamation-triangle me-2"></i>Event Full
+                                    </div>
+                                {% endif %}
+                                
+                                <div class="d-grid">
+                                    <a href="{% url 'event_detail' event.id %}" class="btn btn-outline-success">
+                                        <i class="bi bi-info-circle me-2"></i>View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+                <nav aria-label="Events pagination" class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if current_filters.event_type %}&event_type={{ current_filters.event_type }}{% endif %}{% if current_filters.location %}&location={{ current_filters.location }}{% endif %}{% if current_filters.date %}&date={{ current_filters.date }}{% endif %}">
+                                    <i class="bi bi-chevron-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if current_filters.event_type %}&event_type={{ current_filters.event_type }}{% endif %}{% if current_filters.location %}&location={{ current_filters.location }}{% endif %}{% if current_filters.date %}&date={{ current_filters.date }}{% endif %}">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% if current_filters.event_type %}&event_type={{ current_filters.event_type }}{% endif %}{% if current_filters.location %}&location={{ current_filters.location }}{% endif %}{% if current_filters.date %}&date={{ current_filters.date }}{% endif %}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if current_filters.event_type %}&event_type={{ current_filters.event_type }}{% endif %}{% if current_filters.location %}&location={{ current_filters.location }}{% endif %}{% if current_filters.date %}&date={{ current_filters.date }}{% endif %}">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if current_filters.event_type %}&event_type={{ current_filters.event_type }}{% endif %}{% if current_filters.location %}&location={{ current_filters.location }}{% endif %}{% if current_filters.date %}&date={{ current_filters.date }}{% endif %}">
+                                    <i class="bi bi-chevron-double-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+            
+        {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-calendar-x text-muted" style="font-size: 4rem;"></i>
+                <h4 class="mt-3 text-muted">No events found</h4>
+                <p class="text-muted">Try adjusting your filters or check back later for new events!</p>
+                <a href="{% url 'events' %}" class="btn btn-green">
+                    <i class="bi bi-arrow-clockwise me-2"></i>Clear Filters
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %} 

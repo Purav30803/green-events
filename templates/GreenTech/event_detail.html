@@ -1,0 +1,232 @@
+{% extends 'GreenTech/base.html' %}
+
+{% block title %}{{ event.title }} - Green Events & Volunteering Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+    #map {
+        height: 400px;
+        width: 100%;
+        border-radius: 10px;
+    }
+    
+    .event-header {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 60px 0;
+    }
+    
+    .event-info-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .registration-status {
+        position: sticky;
+        top: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Event Header -->
+<section class="event-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-white">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'events' %}" class="text-white">Events</a></li>
+                        <li class="breadcrumb-item active text-white-50" aria-current="page">{{ event.title }}</li>
+                    </ol>
+                </nav>
+                
+                <span class="badge bg-light text-dark mb-3">{{ event.get_event_type_display }}</span>
+                <h1 class="display-5 fw-bold mb-3">{{ event.title }}</h1>
+                <p class="lead mb-4">{{ event.description|truncatewords:30 }}</p>
+                
+                <div class="row text-white-50">
+                    <div class="col-md-3 mb-2">
+                        <i class="bi bi-calendar me-2"></i>{{ event.date|date:"l, M d, Y" }}
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <i class="bi bi-clock me-2"></i>{{ event.start_time|time:"g:i A" }} - {{ event.end_time|time:"g:i A" }}
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <i class="bi bi-geo-alt me-2"></i>{{ event.location }}
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <i class="bi bi-people me-2"></i>{{ event.current_participants }}/{{ event.max_participants }} spots
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Event Content -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                <!-- Event Image -->
+                {% if event.image %}
+                    <div class="mb-4">
+                        <img src="{{ event.image.url }}" class="img-fluid rounded" alt="{{ event.title }}">
+                    </div>
+                {% endif %}
+                
+                <!-- Event Description -->
+                <div class="card event-info-card mb-4">
+                    <div class="card-body">
+                        <h4 class="card-title">About This Event</h4>
+                        <p class="card-text">{{ event.description }}</p>
+                    </div>
+                </div>
+                
+                <!-- Event Details -->
+                <div class="card event-info-card mb-4">
+                    <div class="card-body">
+                        <h4 class="card-title">Event Details</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-calendar-event text-success me-3" style="font-size: 1.5rem;"></i>
+                                    <div>
+                                        <strong>Date & Time</strong><br>
+                                        <span class="text-muted">{{ event.date|date:"l, F d, Y" }}<br>
+                                        {{ event.start_time|time:"g:i A" }} - {{ event.end_time|time:"g:i A" }}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-geo-alt text-success me-3" style="font-size: 1.5rem;"></i>
+                                    <div>
+                                        <strong>Location</strong><br>
+                                        <span class="text-muted">{{ event.location }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-people text-success me-3" style="font-size: 1.5rem;"></i>
+                                    <div>
+                                        <strong>Capacity</strong><br>
+                                        <span class="text-muted">{{ event.current_participants }} of {{ event.max_participants }} spots filled</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-person-badge text-success me-3" style="font-size: 1.5rem;"></i>
+                                    <div>
+                                        <strong>Organizer</strong><br>
+                                        <span class="text-muted">{{ event.organizer.get_full_name|default:event.organizer.username }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Map Section -->
+                {% if event.latitude and event.longitude %}
+                    <div class="card event-info-card mb-4">
+                        <div class="card-body">
+                            <h4 class="card-title">Event Location</h4>
+                            <div id="map"></div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Registration Sidebar -->
+            <div class="col-lg-4">
+                <div class="card event-info-card registration-status">
+                    <div class="card-body">
+                        <h5 class="card-title">Registration</h5>
+                        
+                        <!-- Progress Bar -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <small class="text-muted">Spots Filled</small>
+                                <small class="text-muted">{{ event.current_participants }}/{{ event.max_participants }}</small>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-success" role="progressbar" 
+                                     style="width: {{ event.current_participants|div:event.max_participants|mul:100 }}%"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Registration Status -->
+                        {% if event.is_full %}
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle me-2"></i>This event is full
+                            </div>
+                        {% elif is_registered %}
+                            <div class="alert alert-success">
+                                <i class="bi bi-check-circle me-2"></i>You are registered for this event
+                            </div>
+                            <form method="post" action="{% url 'unregister_from_event' event.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger w-100">
+                                    <i class="bi bi-x-circle me-2"></i>Cancel Registration
+                                </button>
+                            </form>
+                        {% else %}
+                            {% if user.is_authenticated %}
+                                <form method="post" action="{% url 'register_for_event' event.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-green w-100">
+                                        <i class="bi bi-person-plus me-2"></i>Register for Event
+                                    </button>
+                                </form>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    <i class="bi bi-info-circle me-2"></i>Sign in to register for this event
+                                </div>
+                                <a href="{% url 'signin' %}" class="btn btn-green w-100">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                        
+                        <!-- Event Stats -->
+                        <hr>
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <h6 class="text-muted">Available Spots</h6>
+                                <h4 class="text-success">{{ event.available_spots }}</h4>
+                            </div>
+                            <div class="col-6">
+                                <h6 class="text-muted">Days Left</h6>
+                                <h4 class="text-primary">{{ event.date|timeuntil }}</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+{% if event.latitude and event.longitude %}
+<script>
+    // Initialize map
+    var map = L.map('map').setView([{{ event.latitude }}, {{ event.longitude }}], 15);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+    
+    // Add marker for event location
+    var marker = L.marker([{{ event.latitude }}, {{ event.longitude }}]).addTo(map);
+    marker.bindPopup("<b>{{ event.title }}</b><br>{{ event.location }}");
+</script>
+{% endif %}
+{% endblock %} 

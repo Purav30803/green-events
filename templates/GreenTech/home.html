@@ -1,0 +1,181 @@
+{% extends 'GreenTech/base.html' %}
+
+{% block title %}Home - Green Events & Volunteering Portal{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">Join the Green Revolution</h1>
+                <p class="lead mb-4">Discover local eco-friendly events and volunteering opportunities. Make a difference in your community while helping the environment.</p>
+                <div class="d-flex gap-3">
+                    <a href="{% url 'events' %}" class="btn btn-light btn-lg">
+                        <i class="bi bi-calendar-event me-2"></i>Browse Events
+                    </a>
+                    {% if not user.is_authenticated %}
+                        <a href="{% url 'signup' %}" class="btn btn-outline-light btn-lg">
+                            <i class="bi bi-person-plus me-2"></i>Join Us
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <i class="bi bi-tree-fill" style="font-size: 8rem; opacity: 0.8;"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-4 mb-4">
+                <div class="card stats-card h-100">
+                    <div class="card-body">
+                        <i class="bi bi-calendar-check text-success" style="font-size: 3rem;"></i>
+                        <h3 class="mt-3">{{ total_events }}</h3>
+                        <p class="text-muted">Total Events</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card stats-card h-100">
+                    <div class="card-body">
+                        <i class="bi bi-people-fill text-success" style="font-size: 3rem;"></i>
+                        <h3 class="mt-3">{{ total_participants }}</h3>
+                        <p class="text-muted">Volunteers</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card stats-card h-100">
+                    <div class="card-body">
+                        <i class="bi bi-geo-alt-fill text-success" style="font-size: 3rem;"></i>
+                        <h3 class="mt-3">50+</h3>
+                        <p class="text-muted">Locations</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Upcoming Events Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-lg-8">
+                <h2 class="fw-bold">Upcoming Events</h2>
+                <p class="text-muted">Don't miss out on these amazing opportunities to make a difference!</p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="{% url 'events' %}" class="btn btn-green">
+                    <i class="bi bi-calendar-event me-2"></i>View All Events
+                </a>
+            </div>
+        </div>
+        
+        {% if upcoming_events %}
+            <div class="row">
+                {% for event in upcoming_events %}
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card event-card h-100">
+                            {% if event.image %}
+                                <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}" style="height: 200px; object-fit: cover;">
+                            {% else %}
+                                <div class="card-img-top bg-success d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <i class="bi bi-tree-fill text-white" style="font-size: 3rem;"></i>
+                                </div>
+                            {% endif %}
+                            
+                            <span class="badge bg-primary event-type-badge">{{ event.get_event_type_display }}</span>
+                            
+                            <div class="card-body">
+                                <h5 class="card-title">{{ event.title }}</h5>
+                                <p class="card-text text-muted">{{ event.description|truncatewords:20 }}</p>
+                                
+                                <div class="row text-muted small mb-3">
+                                    <div class="col-6">
+                                        <i class="bi bi-calendar me-1"></i>{{ event.date|date:"M d, Y" }}
+                                    </div>
+                                    <div class="col-6">
+                                        <i class="bi bi-clock me-1"></i>{{ event.start_time|time:"g:i A" }}
+                                    </div>
+                                </div>
+                                
+                                <div class="row text-muted small mb-3">
+                                    <div class="col-6">
+                                        <i class="bi bi-geo-alt me-1"></i>{{ event.location }}
+                                    </div>
+                                    <div class="col-6">
+                                        <i class="bi bi-people me-1"></i>{{ event.current_participants }}/{{ event.max_participants }}
+                                    </div>
+                                </div>
+                                
+                                <div class="d-grid">
+                                    <a href="{% url 'event_detail' event.id %}" class="btn btn-outline-success">
+                                        <i class="bi bi-info-circle me-2"></i>Learn More
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-calendar-x text-muted" style="font-size: 4rem;"></i>
+                <h4 class="mt-3 text-muted">No upcoming events</h4>
+                <p class="text-muted">Check back later for new events!</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="fw-bold">Why Join Our Community?</h2>
+                <p class="text-muted">Discover the benefits of participating in our green events</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="text-center">
+                    <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-tree-fill text-success" style="font-size: 2rem;"></i>
+                    </div>
+                    <h5>Environmental Impact</h5>
+                    <p class="text-muted">Make a real difference in your local environment through tree planting, cleanups, and conservation efforts.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="text-center">
+                    <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-people-fill text-success" style="font-size: 2rem;"></i>
+                    </div>
+                    <h5>Community Building</h5>
+                    <p class="text-muted">Connect with like-minded individuals who share your passion for environmental conservation.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="text-center">
+                    <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-award-fill text-success" style="font-size: 2rem;"></i>
+                    </div>
+                    <h5>Skill Development</h5>
+                    <p class="text-muted">Learn new skills and gain valuable experience in environmental conservation and community service.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %} 
