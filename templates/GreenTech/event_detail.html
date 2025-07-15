@@ -161,7 +161,7 @@
                             </div>
                             <form method="post" action="{% url 'unregister_from_event' event.id %}">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-outline-danger w-100">
+                                <button type="s ubmit" class="btn btn-outline-danger w-100">
                                     <i class="bi bi-x-circle me-2"></i>Cancel Registration
                                 </button>
                             </form>
@@ -206,16 +206,22 @@
 {% block extra_js %}
 {% if event.latitude and event.longitude %}
 <script>
-    // Initialize map
-    var map = L.map('map').setView([{{ event.latitude }}, {{ event.longitude }}], 15);
-    
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
-    
-    // Add marker for event location
-    var marker = L.marker([{{ event.latitude }}, {{ event.longitude }}]).addTo(map);
-    marker.bindPopup("<b>{{ event.title }}</b><br>{{ event.location }}");
+    // Parse coordinates as floats, fallback to 0 if missing
+    const latitude = parseFloat("{{ event.latitude|default_if_none:'0' }}");
+    const longitude = parseFloat("{{ event.longitude|default_if_none:'0' }}");
+
+    if (!isNaN(latitude) && !isNaN(longitude) && latitude !== 0 && longitude !== 0) {
+        // Initialize map
+        const map = L.map('map').setView([latitude, longitude], 15);
+
+        // Load OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        // Add marker for event location
+        console.log(latitude, longitude);
+        const marker = L.marker([latitude, longitude]).addTo(map);
+        marker.bindPopup("<b>{{ event.title|escapejs }}</b><br>{{ event.location|escapejs }}").openPopup();
+    }
 </script>
 {% endif %}
 {% endblock %} 

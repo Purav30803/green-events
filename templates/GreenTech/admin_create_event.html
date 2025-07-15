@@ -3,6 +3,10 @@
 
 {% block title %}Create Event - Admin{% endblock %}
 
+{% block main_navbar %}
+{% include 'GreenTech/admin_nav.html' %}
+{% endblock %}
+
 {% block extra_css %}
 <style>
     .admin-create-event {
@@ -203,7 +207,6 @@
 {% endblock %}
 
 {% block content %}
-{% include 'GreenTech/admin_nav.html' %}
 <div class="admin-create-event">
     <div class="admin-header">
         <h1 class="admin-title">Create New Event</h1>

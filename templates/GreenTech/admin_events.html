@@ -3,6 +3,10 @@
 
 {% block title %}Manage Events - Admin{% endblock %}
 
+{% block main_navbar %}
+{% include 'GreenTech/admin_nav.html' %}
+{% endblock %}
+
 {% block extra_css %}
 <style>
     .admin-events {
@@ -333,7 +337,6 @@
 {% endblock %}
 
 {% block content %}
-{% include 'GreenTech/admin_nav.html' %}
 <div class="admin-events">
     <div class="admin-header">
         <h1 class="admin-title">Manage Events</h1>

@@ -71,6 +71,7 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    {% block main_navbar %}
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-success">
         <div class="container">
@@ -117,6 +118,7 @@
             </div>
         </div>
     </nav>
+    {% endblock %}
 
     <!-- Messages -->
     {% if messages %}

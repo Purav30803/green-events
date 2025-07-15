@@ -1,0 +1,68 @@
+{% extends 'GreenTech/base.html' %}
+
+{% block title %}Edit Event - Admin{% endblock %}
+
+{% block main_navbar %}
+{% include 'GreenTech/admin_nav.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Edit Event: {{ event.title }}</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label class="form-label">Title</label>
+            <input type="text" name="title" class="form-control" value="{{ event.title }}" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea name="description" class="form-control" required>{{ event.description }}</textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Event Type</label>
+            <select name="event_type" class="form-control" required>
+                {% for type_code, type_name in event_types %}
+                <option value="{{ type_code }}" {% if event.event_type == type_code %}selected{% endif %}>{{ type_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Location</label>
+            <input type="text" name="location" class="form-control" value="{{ event.location }}" required>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Latitude</label>
+                <input type="number" step="any" name="latitude" class="form-control" value="{{ event.latitude }}">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Longitude</label>
+                <input type="number" step="any" name="longitude" class="form-control" value="{{ event.longitude }}">
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Date</label>
+            <input type="date" name="date" class="form-control" value="{{ event.date }}" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Start Time</label>
+            <input type="time" name="start_time" class="form-control" value="{{ event.start_time|time:'H:i' }}" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">End Time</label>
+            <input type="time" name="end_time" class="form-control" value="{{ event.end_time|time:'H:i' }}" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Max Participants</label>
+            <input type="number" name="max_participants" class="form-control" value="{{ event.max_participants }}" required>
+        </div>
+        <div class="mb-3 form-check">
+            <input type="checkbox" name="is_active" class="form-check-input" id="is_active" {% if event.is_active %}checked{% endif %}>
+            <label class="form-check-label" for="is_active">Active</label>
+        </div>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a href="{% url 'admin_events' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %} 
