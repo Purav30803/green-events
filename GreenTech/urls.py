@@ -14,4 +14,19 @@ urlpatterns = [
     path('signup/', views.signup, name='signup'),
     path('signout/', views.signout, name='signout'),
     path('activate/<uidb64>/<token>', views.activate, name='activate'),
+    
+    # Custom Admin URLs
+    path('admin/', views.admin_dashboard, name='admin_dashboard'),
+    path('admin/events/', views.admin_events, name='admin_events'),
+    path('admin/events/create/', views.admin_create_event, name='admin_create_event'),
+    path('admin/events/<int:event_id>/', views.admin_event_detail, name='admin_event_detail'),
+    path('admin/events/<int:event_id>/delete/', views.admin_delete_event, name='admin_delete_event'),
+    path('admin/registrations/', views.admin_registrations, name='admin_registrations'),
+    path('admin/users/', views.admin_users, name='admin_users'),
+    path('admin/users/<int:user_id>/', views.admin_user_detail, name='admin_user_detail'),
+    
+    # AJAX endpoints
+    path('admin/events/<int:event_id>/toggle-status/', views.toggle_event_status, name='toggle_event_status'),
+    path('admin/registrations/<int:registration_id>/toggle-attendance/', views.toggle_registration_attendance, name='toggle_registration_attendance'),
+    path('admin/stats/', views.get_event_stats, name='get_event_stats'),
 ]

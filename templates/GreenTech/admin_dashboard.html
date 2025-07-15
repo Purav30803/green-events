@@ -1,0 +1,359 @@
+{% extends 'GreenTech/base.html' %}
+{% load static %}
+
+{% block title %}Admin Dashboard - GreenTech{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-dashboard {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+    }
+    
+    .admin-header {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .admin-title {
+        color: #2c3e50;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+    
+    .admin-subtitle {
+        color: #7f8c8d;
+        font-size: 1.1rem;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #3498db;
+        margin-bottom: 10px;
+    }
+    
+    .stat-label {
+        color: #7f8c8d;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .content-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 30px;
+    }
+    
+    .recent-section {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .section-title {
+        color: #2c3e50;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #ecf0f1;
+    }
+    
+    .activity-item {
+        padding: 15px 0;
+        border-bottom: 1px solid #ecf0f1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+    
+    .activity-info h4 {
+        color: #2c3e50;
+        margin-bottom: 5px;
+        font-size: 1rem;
+    }
+    
+    .activity-info p {
+        color: #7f8c8d;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+    
+    .activity-status {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .status-active {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-inactive {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .status-attended {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+    
+    .admin-nav {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .nav-item {
+        display: block;
+        padding: 15px 20px;
+        margin-bottom: 10px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        color: #2c3e50;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border-left: 4px solid transparent;
+    }
+    
+    .nav-item:hover {
+        background: #3498db;
+        color: white;
+        border-left-color: #2980b9;
+        transform: translateX(5px);
+    }
+    
+    .nav-item.active {
+        background: #3498db;
+        color: white;
+        border-left-color: #2980b9;
+    }
+    
+    .nav-icon {
+        margin-right: 10px;
+        font-size: 1.2rem;
+    }
+    
+    .quick-actions {
+        margin-top: 20px;
+    }
+    
+    .action-btn {
+        display: inline-block;
+        padding: 12px 20px;
+        background: #27ae60;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .action-btn:hover {
+        background: #229954;
+        transform: translateY(-2px);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .action-btn.secondary {
+        background: #95a5a6;
+    }
+    
+    .action-btn.secondary:hover {
+        background: #7f8c8d;
+    }
+    
+    @media (max-width: 768px) {
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .stats-grid {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+        
+        .admin-title {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% include 'GreenTech/admin_nav.html' %}
+<div class="admin-dashboard">
+    <div class="admin-header">
+        <h1 class="admin-title">Admin Dashboard</h1>
+        <p class="admin-subtitle">Manage your GreenTech events and community</p>
+    </div>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">{{ total_events }}</div>
+            <div class="stat-label">Total Events</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ active_events }}</div>
+            <div class="stat-label">Active Events</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_registrations }}</div>
+            <div class="stat-label">Total Registrations</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_users }}</div>
+            <div class="stat-label">Registered Users</div>
+        </div>
+    </div>
+    
+    <div class="content-grid">
+        <div class="recent-section">
+            <h2 class="section-title">Recent Activities</h2>
+            
+            <div class="activity-item">
+                <div class="activity-info">
+                    <h4>Recent Events</h4>
+                    <p>Latest events created in the system</p>
+                </div>
+            </div>
+            
+            {% for event in recent_events %}
+            <div class="activity-item">
+                <div class="activity-info">
+                    <h4>{{ event.title }}</h4>
+                    <p>{{ event.date }} • {{ event.location }}</p>
+                </div>
+                <span class="activity-status {% if event.is_active %}status-active{% else %}status-inactive{% endif %}">
+                    {% if event.is_active %}Active{% else %}Inactive{% endif %}
+                </span>
+            </div>
+            {% empty %}
+            <div class="activity-item">
+                <div class="activity-info">
+                    <h4>No events yet</h4>
+                    <p>Create your first event to get started</p>
+                </div>
+            </div>
+            {% endfor %}
+            
+            <div class="activity-item">
+                <div class="activity-info">
+                    <h4>Recent Registrations</h4>
+                    <p>Latest user registrations for events</p>
+                </div>
+            </div>
+            
+            {% for registration in recent_registrations %}
+            <div class="activity-item">
+                <div class="activity-info">
+                    <h4>{{ registration.user.get_full_name|default:registration.user.username }}</h4>
+                    <p>{{ registration.event.title }} • {{ registration.registered_at|date:"M d, Y" }}</p>
+                </div>
+                <span class="activity-status {% if registration.attended %}status-attended{% else %}status-inactive{% endif %}">
+                    {% if registration.attended %}Attended{% else %}Not Attended{% endif %}
+                </span>
+            </div>
+            {% empty %}
+            <div class="activity-item">
+                <div class="activity-info">
+                    <h4>No registrations yet</h4>
+                    <p>Users will appear here when they register for events</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="admin-nav">
+            <h3 class="section-title">Admin Navigation</h3>
+            
+            <a href="{% url 'admin_events' %}" class="nav-item">
+                <i class="nav-icon">📅</i>
+                Manage Events
+            </a>
+            
+            <a href="{% url 'admin_create_event' %}" class="nav-item">
+                <i class="nav-icon">➕</i>
+                Create Event
+            </a>
+            
+            <a href="{% url 'admin_registrations' %}" class="nav-item">
+                <i class="nav-icon">👥</i>
+                View Registrations
+            </a>
+            
+            <a href="{% url 'admin_users' %}" class="nav-item">
+                <i class="nav-icon">👤</i>
+                Manage Users
+            </a>
+            
+            <div class="quick-actions">
+                <h4 style="margin-bottom: 15px; color: #2c3e50;">Quick Actions</h4>
+                
+                <a href="{% url 'admin_create_event' %}" class="action-btn">
+                    Create Event
+                </a>
+                
+                <a href="{% url 'admin_events' %}" class="action-btn secondary">
+                    View All Events
+                </a>
+                
+                <a href="{% url 'home' %}" class="action-btn secondary">
+                    View Site
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-refresh stats every 30 seconds
+    setInterval(function() {
+        fetch('{% url "get_event_stats" %}')
+            .then(response => response.json())
+            .then(data => {
+                // Update stats if needed
+                console.log('Stats updated:', data);
+            })
+            .catch(error => console.error('Error updating stats:', error));
+    }, 30000);
+</script>
+{% endblock %} 

@@ -2,6 +2,23 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
+from django import template
+
+register = template.Library()
+
+@register.filter
+def div(value, arg):
+    try:
+        return float(value) / float(arg) if arg else 0
+    except (ValueError, ZeroDivisionError):
+        return 0
+
+@register.filter
+def mul(value, arg):
+    try:
+        return float(value) * float(arg)
+    except (ValueError, TypeError):
+        return 0
 
 
 class UserProfile(models.Model):

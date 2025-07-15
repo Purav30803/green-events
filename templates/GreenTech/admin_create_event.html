@@ -1,0 +1,400 @@
+{% extends 'GreenTech/base.html' %}
+{% load static %}
+
+{% block title %}Create Event - Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-create-event {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+    }
+    
+    .admin-header {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .admin-title {
+        color: #2c3e50;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+    
+    .admin-subtitle {
+        color: #7f8c8d;
+        font-size: 1.1rem;
+    }
+    
+    .form-section {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+    }
+    
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .form-label {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 8px;
+        font-size: 1rem;
+    }
+    
+    .form-input {
+        padding: 12px 15px;
+        border: 2px solid #ecf0f1;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+        font-family: inherit;
+    }
+    
+    .form-input:focus {
+        outline: none;
+        border-color: #3498db;
+    }
+    
+    .form-textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+    
+    .form-select {
+        background: white;
+    }
+    
+    .form-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    
+    .form-checkbox input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #3498db;
+    }
+    
+    .form-checkbox label {
+        color: #2c3e50;
+        font-weight: 500;
+        cursor: pointer;
+    }
+    
+    .coordinates-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+    
+    .time-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 2px solid #ecf0f1;
+    }
+    
+    .btn-primary {
+        padding: 12px 30px;
+        background: #27ae60;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        background: #229954;
+        transform: translateY(-2px);
+    }
+    
+    .btn-secondary {
+        padding: 12px 30px;
+        background: #95a5a6;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .btn-secondary:hover {
+        background: #7f8c8d;
+        transform: translateY(-2px);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .required {
+        color: #e74c3c;
+    }
+    
+    .help-text {
+        color: #7f8c8d;
+        font-size: 0.9rem;
+        margin-top: 5px;
+    }
+    
+    .error-message {
+        color: #e74c3c;
+        font-size: 0.9rem;
+        margin-top: 5px;
+    }
+    
+    .success-message {
+        background: #d4edda;
+        color: #155724;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border: 1px solid #c3e6cb;
+    }
+    
+    @media (max-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .coordinates-group,
+        .time-group {
+            grid-template-columns: 1fr;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+        }
+        
+        .admin-title {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% include 'GreenTech/admin_nav.html' %}
+<div class="admin-create-event">
+    <div class="admin-header">
+        <h1 class="admin-title">Create New Event</h1>
+        <p class="admin-subtitle">Add a new environmental event to your platform</p>
+    </div>
+    
+    <div class="form-section">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="{% if message.tags == 'success' %}success-message{% else %}error-message{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="form-grid">
+                <!-- Basic Information -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Event Title <span class="required">*</span>
+                    </label>
+                    <input type="text" name="title" class="form-input" required 
+                           placeholder="Enter event title">
+                    <div class="help-text">Choose a clear, descriptive title for your event</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        Event Type <span class="required">*</span>
+                    </label>
+                    <select name="event_type" class="form-input form-select" required>
+                        <option value="">Select event type</option>
+                        {% for type_code, type_name in event_types %}
+                        <option value="{{ type_code }}">{{ type_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label class="form-label">
+                        Description <span class="required">*</span>
+                    </label>
+                    <textarea name="description" class="form-input form-textarea" required
+                              placeholder="Describe your event in detail..."></textarea>
+                    <div class="help-text">Provide a comprehensive description of what participants can expect</div>
+                </div>
+                
+                <!-- Location Information -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Location <span class="required">*</span>
+                    </label>
+                    <input type="text" name="location" class="form-input" required
+                           placeholder="Enter event location">
+                    <div class="help-text">Street address or general location</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Coordinates (Optional)</label>
+                    <div class="coordinates-group">
+                        <input type="number" name="latitude" class="form-input" step="any"
+                               placeholder="Latitude">
+                        <input type="number" name="longitude" class="form-input" step="any"
+                               placeholder="Longitude">
+                    </div>
+                    <div class="help-text">GPS coordinates for map display</div>
+                </div>
+                
+                <!-- Date and Time -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Event Date <span class="required">*</span>
+                    </label>
+                    <input type="date" name="date" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Event Time</label>
+                    <div class="time-group">
+                        <input type="time" name="start_time" class="form-input" required>
+                        <input type="time" name="end_time" class="form-input" required>
+                    </div>
+                    <div class="help-text">Start and end times for the event</div>
+                </div>
+                
+                <!-- Capacity -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Maximum Participants <span class="required">*</span>
+                    </label>
+                    <input type="number" name="max_participants" class="form-input" required
+                           min="1" value="50">
+                    <div class="help-text">Maximum number of participants allowed</div>
+                </div>
+                
+                <!-- Status -->
+                <div class="form-group">
+                    <div class="form-checkbox">
+                        <input type="checkbox" name="is_active" id="is_active" checked>
+                        <label for="is_active">Event is active and visible to users</label>
+                    </div>
+                    <div class="help-text">Inactive events won't be shown to users</div>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Create Event</button>
+                <a href="{% url 'admin_events' %}" class="btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Form validation
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const title = document.querySelector('input[name="title"]').value.trim();
+        const eventType = document.querySelector('select[name="event_type"]').value;
+        const description = document.querySelector('textarea[name="description"]').value.trim();
+        const location = document.querySelector('input[name="location"]').value.trim();
+        const date = document.querySelector('input[name="date"]').value;
+        const startTime = document.querySelector('input[name="start_time"]').value;
+        const endTime = document.querySelector('input[name="end_time"]').value;
+        const maxParticipants = document.querySelector('input[name="max_participants"]').value;
+        
+        let isValid = true;
+        let errorMessage = '';
+        
+        if (!title) {
+            errorMessage += 'Event title is required.\n';
+            isValid = false;
+        }
+        
+        if (!eventType) {
+            errorMessage += 'Event type is required.\n';
+            isValid = false;
+        }
+        
+        if (!description) {
+            errorMessage += 'Event description is required.\n';
+            isValid = false;
+        }
+        
+        if (!location) {
+            errorMessage += 'Event location is required.\n';
+            isValid = false;
+        }
+        
+        if (!date) {
+            errorMessage += 'Event date is required.\n';
+            isValid = false;
+        }
+        
+        if (!startTime || !endTime) {
+            errorMessage += 'Event start and end times are required.\n';
+            isValid = false;
+        }
+        
+        if (!maxParticipants || maxParticipants < 1) {
+            errorMessage += 'Maximum participants must be at least 1.\n';
+            isValid = false;
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+            alert('Please fix the following errors:\n\n' + errorMessage);
+        }
+    });
+    
+    // Auto-fill today's date if not set
+    const dateInput = document.querySelector('input[name="date"]');
+    if (!dateInput.value) {
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.value = today;
+    }
+    
+    // Set default end time to 2 hours after start time
+    const startTimeInput = document.querySelector('input[name="start_time"]');
+    const endTimeInput = document.querySelector('input[name="end_time"]');
+    
+    startTimeInput.addEventListener('change', function() {
+        if (this.value && !endTimeInput.value) {
+            const startTime = new Date(`2000-01-01T${this.value}`);
+            const endTime = new Date(startTime.getTime() + 2 * 60 * 60 * 1000); // Add 2 hours
+            endTimeInput.value = endTime.toTimeString().slice(0, 5);
+        }
+    });
+</script>
+{% endblock %} 

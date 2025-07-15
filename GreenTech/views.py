@@ -18,6 +18,16 @@ from django.utils.encoding import force_bytes, force_str
 from Iads.tokens import generate_token
 from django.core.mail import EmailMessage
 from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib import messages
+from django.http import JsonResponse
+from django.core.paginator import Paginator
+from django.db.models import Q, Count
+from django.utils import timezone
+from .models import Event, EventRegistration, UserProfile
+from django.contrib.auth.models import User
+from datetime import datetime, timedelta
+import json
 
 
 def home(request):
@@ -301,3 +311,337 @@ def activate(request, uidb64, token):
         return redirect('/')
     else:
         return render(request, 'activation_failed.html')
+
+
+def is_admin(user):
+    return user.is_authenticated and user.is_staff
+
+@login_required
+@user_passes_test(is_admin)
+def admin_dashboard(request):
+    """Custom admin dashboard"""
+    # Get statistics
+    total_events = Event.objects.count()
+    active_events = Event.objects.filter(is_active=True).count()
+    total_registrations = EventRegistration.objects.count()
+    total_users = User.objects.count()
+    
+    # Recent events
+    recent_events = Event.objects.order_by('-created_at')[:5]
+    
+    # Upcoming events
+    upcoming_events = Event.objects.filter(
+        date__gte=timezone.now().date(),
+        is_active=True
+    ).order_by('date')[:5]
+    
+    # Recent registrations
+    recent_registrations = EventRegistration.objects.select_related('user', 'event').order_by('-registered_at')[:10]
+    
+    context = {
+        'total_events': total_events,
+        'active_events': active_events,
+        'total_registrations': total_registrations,
+        'total_users': total_users,
+        'recent_events': recent_events,
+        'upcoming_events': upcoming_events,
+        'recent_registrations': recent_registrations,
+    }
+    return render(request, 'GreenTech/admin_dashboard.html', context)
+
+@login_required
+@user_passes_test(is_admin)
+def admin_events(request):
+    """Manage events"""
+    events = Event.objects.select_related('organizer').order_by('-created_at')
+    
+    # Search functionality
+    search_query = request.GET.get('search', '')
+    if search_query:
+        events = events.filter(
+            Q(title__icontains=search_query) |
+            Q(description__icontains=search_query) |
+            Q(location__icontains=search_query) |
+            Q(organizer__username__icontains=search_query)
+        )
+    
+    # Filter by event type
+    event_type = request.GET.get('event_type', '')
+    if event_type:
+        events = events.filter(event_type=event_type)
+    
+    # Filter by status
+    status = request.GET.get('status', '')
+    if status == 'active':
+        events = events.filter(is_active=True)
+    elif status == 'inactive':
+        events = events.filter(is_active=False)
+    
+    # Pagination
+    paginator = Paginator(events, 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+        'event_type': event_type,
+        'status': status,
+        'event_types': Event.EVENT_TYPES,
+    }
+    return render(request, 'GreenTech/admin_events.html', context)
+
+@login_required
+@user_passes_test(is_admin)
+def admin_event_detail(request, event_id):
+    """View and edit event details"""
+    event = get_object_or_404(Event, id=event_id)
+    
+    if request.method == 'POST':
+        # Handle event updates
+        event.title = request.POST.get('title')
+        event.description = request.POST.get('description')
+        event.event_type = request.POST.get('event_type')
+        event.location = request.POST.get('location')
+        event.date = request.POST.get('date')
+        event.start_time = request.POST.get('start_time')
+        event.end_time = request.POST.get('end_time')
+        event.max_participants = request.POST.get('max_participants')
+        event.is_active = request.POST.get('is_active') == 'on'
+        
+        # Handle coordinates
+        latitude = request.POST.get('latitude')
+        longitude = request.POST.get('longitude')
+        if latitude and longitude:
+            event.latitude = float(latitude)
+            event.longitude = float(longitude)
+        
+        event.save()
+        messages.success(request, 'Event updated successfully!')
+        return redirect('admin_events')
+    
+    # Get registrations for this event
+    registrations = EventRegistration.objects.filter(event=event).select_related('user')
+    
+    context = {
+        'event': event,
+        'registrations': registrations,
+        'event_types': Event.EVENT_TYPES,
+    }
+    return render(request, 'GreenTech/admin_event_detail.html', context)
+
+@login_required
+@user_passes_test(is_admin)
+def admin_create_event(request):
+    """Create new event"""
+    if request.method == 'POST':
+        try:
+            event = Event.objects.create(
+                title=request.POST.get('title'),
+                description=request.POST.get('description'),
+                event_type=request.POST.get('event_type'),
+                location=request.POST.get('location'),
+                date=request.POST.get('date'),
+                start_time=request.POST.get('start_time'),
+                end_time=request.POST.get('end_time'),
+                max_participants=request.POST.get('max_participants'),
+                organizer=request.user,
+                is_active=request.POST.get('is_active') == 'on'
+            )
+            
+            # Handle coordinates
+            latitude = request.POST.get('latitude')
+            longitude = request.POST.get('longitude')
+            if latitude and longitude:
+                event.latitude = float(latitude)
+                event.longitude = float(longitude)
+                event.save()
+            
+            messages.success(request, 'Event created successfully!')
+            return redirect('admin_events')
+        except Exception as e:
+            messages.error(request, f'Error creating event: {str(e)}')
+    
+    context = {
+        'event_types': Event.EVENT_TYPES,
+    }
+    return render(request, 'GreenTech/admin_create_event.html', context)
+
+@login_required
+@user_passes_test(is_admin)
+def admin_delete_event(request, event_id):
+    """Delete event"""
+    event = get_object_or_404(Event, id=event_id)
+    if request.method == 'POST':
+        event.delete()
+        messages.success(request, 'Event deleted successfully!')
+        return redirect('admin_events')
+    
+    return render(request, 'GreenTech/admin_delete_event.html', {'event': event})
+
+@login_required
+@user_passes_test(is_admin)
+def admin_registrations(request):
+    """Manage event registrations"""
+    registrations = EventRegistration.objects.select_related('user', 'event').order_by('-registered_at')
+    
+    # Search functionality
+    search_query = request.GET.get('search', '')
+    if search_query:
+        registrations = registrations.filter(
+            Q(user__username__icontains=search_query) |
+            Q(user__first_name__icontains=search_query) |
+            Q(user__last_name__icontains=search_query) |
+            Q(user__email__icontains=search_query) |
+            Q(event__title__icontains=search_query)
+        )
+    
+    # Filter by attendance
+    attended = request.GET.get('attended', '')
+    if attended == 'yes':
+        registrations = registrations.filter(attended=True)
+    elif attended == 'no':
+        registrations = registrations.filter(attended=False)
+    
+    # Filter by event type
+    event_type = request.GET.get('event_type', '')
+    if event_type:
+        registrations = registrations.filter(event__event_type=event_type)
+    
+    # Pagination
+    paginator = Paginator(registrations, 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+        'attended': attended,
+        'event_type': event_type,
+        'event_types': Event.EVENT_TYPES,
+    }
+    return render(request, 'GreenTech/admin_registrations.html', context)
+
+@login_required
+@user_passes_test(is_admin)
+def admin_users(request):
+    """Manage users"""
+    users = User.objects.select_related('userprofile').order_by('-date_joined')
+    
+    # Search functionality
+    search_query = request.GET.get('search', '')
+    if search_query:
+        users = users.filter(
+            Q(username__icontains=search_query) |
+            Q(first_name__icontains=search_query) |
+            Q(last_name__icontains=search_query) |
+            Q(email__icontains=search_query)
+        )
+    
+    # Filter by staff status
+    staff_status = request.GET.get('staff_status', '')
+    if staff_status == 'staff':
+        users = users.filter(is_staff=True)
+    elif staff_status == 'regular':
+        users = users.filter(is_staff=False)
+    
+    # Pagination
+    paginator = Paginator(users, 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+        'staff_status': staff_status,
+    }
+    return render(request, 'GreenTech/admin_users.html', context)
+
+@login_required
+@user_passes_test(is_admin)
+def admin_user_detail(request, user_id):
+    """View and edit user details"""
+    user = get_object_or_404(User, id=user_id)
+    profile, created = UserProfile.objects.get_or_create(user=user)
+    
+    if request.method == 'POST':
+        # Update user information
+        user.first_name = request.POST.get('first_name')
+        user.last_name = request.POST.get('last_name')
+        user.email = request.POST.get('email')
+        user.is_staff = request.POST.get('is_staff') == 'on'
+        user.is_active = request.POST.get('is_active') == 'on'
+        user.save()
+        
+        # Update profile information
+        profile.phone_number = request.POST.get('phone_number')
+        profile.address = request.POST.get('address')
+        profile.age = request.POST.get('age') or None
+        profile.bio = request.POST.get('bio')
+        profile.save()
+        
+        messages.success(request, 'User updated successfully!')
+        return redirect('admin_users')
+    
+    # Get user's event registrations
+    registrations = EventRegistration.objects.filter(user=user).select_related('event')
+    
+    context = {
+        'user_obj': user,
+        'profile': profile,
+        'registrations': registrations,
+    }
+    return render(request, 'GreenTech/admin_user_detail.html', context)
+
+# AJAX endpoints for dynamic updates
+@login_required
+@user_passes_test(is_admin)
+def toggle_event_status(request, event_id):
+    """Toggle event active status"""
+    if request.method == 'POST':
+        event = get_object_or_404(Event, id=event_id)
+        event.is_active = not event.is_active
+        event.save()
+        return JsonResponse({
+            'success': True,
+            'is_active': event.is_active,
+            'message': 'Event activated' if event.is_active else 'Event deactivated'
+        })
+    return JsonResponse({'success': False})
+
+@login_required
+@user_passes_test(is_admin)
+def toggle_registration_attendance(request, registration_id):
+    """Toggle registration attendance"""
+    if request.method == 'POST':
+        registration = get_object_or_404(EventRegistration, id=registration_id)
+        registration.attended = not registration.attended
+        registration.save()
+        return JsonResponse({
+            'success': True,
+            'attended': registration.attended,
+            'message': 'Marked as attended' if registration.attended else 'Marked as not attended'
+        })
+    return JsonResponse({'success': False})
+
+@login_required
+@user_passes_test(is_admin)
+def get_event_stats(request):
+    """Get event statistics for dashboard"""
+    if request.method == 'GET':
+        total_events = Event.objects.count()
+        active_events = Event.objects.filter(is_active=True).count()
+        total_registrations = EventRegistration.objects.count()
+        attended_registrations = EventRegistration.objects.filter(attended=True).count()
+        
+        # Events by type
+        events_by_type = Event.objects.values('event_type').annotate(count=Count('id'))
+        
+        return JsonResponse({
+            'total_events': total_events,
+            'active_events': active_events,
+            'total_registrations': total_registrations,
+            'attended_registrations': attended_registrations,
+            'events_by_type': list(events_by_type),
+        })
+    return JsonResponse({'success': False})

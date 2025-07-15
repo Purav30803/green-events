@@ -1,0 +1,110 @@
+{% if user.is_authenticated and user.is_staff %}
+<div class="admin-nav-bar">
+    <div class="admin-nav-container">
+        <div class="admin-nav-brand">
+            <a href="{% url 'admin_dashboard' %}">🟢 GreenTech Admin</a>
+        </div>
+        
+        <div class="admin-nav-menu">
+            <a href="{% url 'admin_dashboard' %}" class="admin-nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+                📊 Dashboard
+            </a>
+            <a href="{% url 'admin_events' %}" class="admin-nav-link {% if 'admin_events' in request.resolver_match.url_name %}active{% endif %}">
+                📅 Events
+            </a>
+            <a href="{% url 'admin_registrations' %}" class="admin-nav-link {% if request.resolver_match.url_name == 'admin_registrations' %}active{% endif %}">
+                👥 Registrations
+            </a>
+            <a href="{% url 'admin_users' %}" class="admin-nav-link {% if request.resolver_match.url_name == 'admin_users' %}active{% endif %}">
+                👤 Users
+            </a>
+        </div>
+        
+        <div class="admin-nav-user">
+            <span>Welcome, {{ user.get_full_name|default:user.username }}</span>
+            <a href="{% url 'home' %}" class="admin-nav-link">View Site</a>
+            <a href="{% url 'signout' %}" class="admin-nav-link">Logout</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .admin-nav-bar {
+        background: #2c3e50;
+        color: white;
+        padding: 0;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+    
+    .admin-nav-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+    }
+    
+    .admin-nav-brand a {
+        color: white;
+        text-decoration: none;
+        font-size: 1.2rem;
+        font-weight: 700;
+    }
+    
+    .admin-nav-menu {
+        display: flex;
+        gap: 20px;
+    }
+    
+    .admin-nav-link {
+        color: #bdc3c7;
+        text-decoration: none;
+        padding: 8px 12px;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+    }
+    
+    .admin-nav-link:hover {
+        color: white;
+        background: rgba(255,255,255,0.1);
+    }
+    
+    .admin-nav-link.active {
+        color: white;
+        background: #3498db;
+    }
+    
+    .admin-nav-user {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        font-size: 0.9rem;
+    }
+    
+    .admin-nav-user span {
+        color: #ecf0f1;
+    }
+    
+    @media (max-width: 768px) {
+        .admin-nav-container {
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .admin-nav-menu {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .admin-nav-user {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+    }
+</style>
+{% endif %} 
