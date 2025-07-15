@@ -1,0 +1,22 @@
+@media screen and (min-width:900px) {
+    .heading{
+        margin-top: -15vw !important;
+        margin-left: 8vw !important;
+        color: #fff !important;
+        font-family: 'Roboto Slab' !important;
+    }
+    .complaints .card{
+        width: 200px;
+        margin-left: 5vw;
+
+    }
+    .complaints .card div h1{
+        margin-top: 1.5vw !important;
+
+    }
+    .complaints .card:hover{
+        background: #eee !important;
+    }
+}
+
+

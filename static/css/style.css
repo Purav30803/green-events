@@ -1,0 +1,72 @@
+.nav-link{
+    letter-spacing:1px;
+}
+body{
+    font-family: 'Nunito' !important;
+}
+
+@media screen and (min-width:900px) {
+    .navbar-nav{
+            margin-left: 20vw !important;
+        }
+    .nav-link{
+        margin-left: 2vw !important;
+    }
+    .navbar-brand{
+        margin-right: 200px !important;
+    }
+    .banner-img img{
+        width: 100% !important;
+        margin-top: -1vw !important;
+    }
+    .banner-home{
+        display: flex;
+
+    }
+    .banner-home .card{
+        background: none !important;
+        box-shadow: none !important;
+    }
+    .banner-home .card-1 .card-title {
+        margin-left: 7vw !important;
+        margin-top: 2vw !important;
+    }
+    .banner-home .card-1 .card-text{
+        margin-left: 7vw !important;
+        font-size: 20px !important;
+    }
+    .heading-home{
+        margin-left: 7vw !important;
+        color: #000 !important;
+        font-weight: 700 !important;
+    }
+    .complaints{
+        margin-left: 7vw !important;
+        display: flex;
+    }
+    .complaints .card{
+        margin-left: 1vw;
+    }
+    .complaints .card {
+        background: none !important;
+        box-shadow: none !important;
+    }
+    .complaints .card .card-text{
+        font-size: 20px !important;
+        color: #000;
+        text-align: center !important;
+    }
+
+
+   }
+.banner-home .card .card-title{
+    font-weight: 700 !important;
+    color: #000 !important;
+}
+
+.nav-link:hover{
+    text-decoration: underline !important;
+}
+.active{
+    font-weight: 700;
+}

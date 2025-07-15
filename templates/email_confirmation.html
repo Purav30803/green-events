@@ -1,0 +1,5 @@
+{% autoescape off %}
+Welcome To Complaint Management System {{Name}}
+Please Confirm Your Email Address by clicking on the link below:
+Confirmation Link: http://{{domain}}{% url 'activate' uidb64=uid token=token %}
+{% endautoescape %}
