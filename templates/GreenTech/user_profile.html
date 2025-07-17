@@ -91,15 +91,18 @@
             {% for registration in upcoming_registrations %}
                 <div class="col-lg-4 col-md-6 mb-4">
                     <div class="card event-card h-100">
-                        {% if registration.event.image %}
-                            <img src="{{ registration.event.image.url }}" class="card-img-top" alt="{{ registration.event.title }}" style="height: 200px; object-fit: cover;">
-                        {% else %}
-                            <div class="card-img-top bg-success d-flex align-items-center justify-content-center" style="height: 200px;">
-                                <i class="bi bi-tree-fill text-white" style="font-size: 3rem;"></i>
-                            </div>
-                        {% endif %}
-                        
-                        <span class="badge bg-primary event-type-badge">{{ registration.event.get_event_type_display }}</span>
+                        <div class="card-img-top position-relative" style="height: 200px; overflow: hidden;">
+                            {% if registration.event.image %}
+                                <img src="{{ registration.event.image.url }}" class="w-100 h-100" alt="{{ registration.event.title }}" style="object-fit: cover;">
+                            {% else %}
+                                <img src="{{ registration.event.get_event_image_url }}" class="w-100 h-100" alt="{{ registration.event.title }}" style="object-fit: cover;">
+                            {% endif %}
+                            
+                            <!-- Event Type Badge -->
+                            <span class="badge bg-{{ registration.event.get_event_color_class }} position-absolute top-0 end-0 m-2 event-type-badge">
+                                {{ registration.event.get_event_type_display }}
+                            </span>
+                        </div>
                         
                         <div class="card-body">
                             <h5 class="card-title">{{ registration.event.title }}</h5>
@@ -146,15 +149,18 @@
             {% for registration in past_registrations %}
                 <div class="col-lg-4 col-md-6 mb-4">
                     <div class="card event-card h-100">
-                        {% if registration.event.image %}
-                            <img src="{{ registration.event.image.url }}" class="card-img-top" alt="{{ registration.event.title }}" style="height: 200px; object-fit: cover;">
-                        {% else %}
-                            <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
-                                <i class="bi bi-tree-fill text-white" style="font-size: 3rem;"></i>
-                            </div>
-                        {% endif %}
-                        
-                        <span class="badge bg-secondary event-type-badge">{{ registration.event.get_event_type_display }}</span>
+                        <div class="card-img-top position-relative" style="height: 200px; overflow: hidden;">
+                            {% if registration.event.image %}
+                                <img src="{{ registration.event.image.url }}" class="w-100 h-100" alt="{{ registration.event.title }}" style="object-fit: cover;">
+                            {% else %}
+                                <img src="{{ registration.event.get_event_image_url }}" class="w-100 h-100" alt="{{ registration.event.title }}" style="object-fit: cover;">
+                            {% endif %}
+                            
+                            <!-- Event Type Badge -->
+                            <span class="badge bg-secondary position-absolute top-0 end-0 m-2 event-type-badge">
+                                {{ registration.event.get_event_type_display }}
+                            </span>
+                        </div>
                         
                         <div class="card-body">
                             <h5 class="card-title">{{ registration.event.title }}</h5>

@@ -392,6 +392,7 @@
         <table class="events-table">
             <thead>
                 <tr>
+                    <th>Image</th>
                     <th>Event</th>
                     <th>Type</th>
                     <th>Date</th>
@@ -405,6 +406,15 @@
             <tbody>
                 {% for event in page_obj %}
                 <tr>
+                    <td>
+                        <div style="width: 60px; height: 60px; overflow: hidden; border-radius: 8px;">
+                            {% if event.image %}
+                                <img src="{{ event.image.url }}" alt="{{ event.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+                            {% else %}
+                                <img src="{{ event.get_event_image_url }}" alt="{{ event.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+                            {% endif %}
+                        </div>
+                    </td>
                     <td>
                         <a href="{% url 'admin_event_detail' event.id %}" class="event-title">
                             {{ event.title }}

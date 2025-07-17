@@ -73,11 +73,19 @@
             <!-- Main Content -->
             <div class="col-lg-8">
                 <!-- Event Image -->
-                {% if event.image %}
-                    <div class="mb-4">
+                <div class="mb-4">
+                    {% if event.image %}
                         <img src="{{ event.image.url }}" class="img-fluid rounded" alt="{{ event.title }}">
-                    </div>
-                {% endif %}
+                    {% else %}
+                        <div class="position-relative rounded overflow-hidden">
+                            <img src="{{ event.get_event_image_url }}" class="img-fluid w-100" alt="{{ event.title }}" style="height: 300px; object-fit: cover;">
+                            <!-- Event Type Badge -->
+                            <span class="badge bg-{{ event.get_event_color_class }} position-absolute top-0 end-0 m-3">
+                                {{ event.get_event_type_display }}
+                            </span>
+                        </div>
+                    {% endif %}
+                </div>
                 
                 <!-- Event Description -->
                 <div class="card event-info-card mb-4">

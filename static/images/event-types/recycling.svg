@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="recyclingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#17a2b8;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#20c997;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="200" height="200" fill="url(#recyclingGradient)"/>
+  
+  <!-- Recycling arrows -->
+  <g fill="none" stroke="#ffffff" stroke-width="4">
+    <path d="M 60 80 L 80 60 L 100 80 L 80 100 Z"/>
+    <path d="M 100 60 L 120 80 L 100 100 L 80 80 Z"/>
+    <path d="M 140 80 L 160 60 L 180 80 L 160 100 Z"/>
+  </g>
+  
+  <!-- Recycling bins -->
+  <rect x="40" y="120" width="30" height="50" fill="#28a745"/>
+  <rect x="85" y="120" width="30" height="50" fill="#ffc107"/>
+  <rect x="130" y="120" width="30" height="50" fill="#dc3545"/>
+  
+  <!-- Bin lids -->
+  <rect x="40" y="115" width="30" height="5" fill="#1e7e34"/>
+  <rect x="85" y="115" width="30" height="5" fill="#e0a800"/>
+  <rect x="130" y="115" width="30" height="5" fill="#c82333"/>
+  
+  <!-- Bin labels -->
+  <text x="55" y="150" fill="white" font-size="12" text-anchor="middle">PAPER</text>
+  <text x="100" y="150" fill="black" font-size="12" text-anchor="middle">PLASTIC</text>
+  <text x="145" y="150" fill="white" font-size="12" text-anchor="middle">GLASS</text>
+</svg> 

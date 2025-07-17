@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 from django import template
+from .utils import get_event_type_image, get_event_type_icon, get_event_type_color
 
 register = template.Library()
 
@@ -70,6 +71,28 @@ class Event(models.Model):
     @property
     def available_spots(self):
         return self.max_participants - self.current_participants
+    
+    def get_event_image_url(self):
+        """
+        Returns the image URL for this event.
+        If the event has a custom image, it returns that.
+        Otherwise, it returns a default image based on the event type.
+        """
+        if self.image:
+            return self.image.url
+        return get_event_type_image(self.event_type)
+    
+    def get_event_icon_class(self):
+        """
+        Returns the Bootstrap icon class for this event type.
+        """
+        return get_event_type_icon(self.event_type)
+    
+    def get_event_color_class(self):
+        """
+        Returns the color class for this event type.
+        """
+        return get_event_type_color(self.event_type)
 
 
 class EventRegistration(models.Model):
