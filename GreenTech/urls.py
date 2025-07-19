@@ -27,6 +27,5 @@ urlpatterns = [
     
     # AJAX endpoints
     path('admin/events/<int:event_id>/toggle-status/', views.toggle_event_status, name='toggle_event_status'),
-    path('admin/registrations/<int:registration_id>/toggle-attendance/', views.toggle_registration_attendance, name='toggle_registration_attendance'),
     path('admin/stats/', views.get_event_stats, name='get_event_stats'),
 ]

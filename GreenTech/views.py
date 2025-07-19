@@ -496,13 +496,6 @@ def admin_registrations(request):
             Q(event__title__icontains=search_query)
         )
     
-    # Filter by attendance
-    attended = request.GET.get('attended', '')
-    if attended == 'yes':
-        registrations = registrations.filter(attended=True)
-    elif attended == 'no':
-        registrations = registrations.filter(attended=False)
-    
     # Filter by event type
     event_type = request.GET.get('event_type', '')
     if event_type:
@@ -516,7 +509,6 @@ def admin_registrations(request):
     context = {
         'page_obj': page_obj,
         'search_query': search_query,
-        'attended': attended,
         'event_type': event_type,
         'event_types': Event.EVENT_TYPES,
     }
@@ -606,21 +598,6 @@ def toggle_event_status(request, event_id):
             'success': True,
             'is_active': event.is_active,
             'message': 'Event activated' if event.is_active else 'Event deactivated'
-        })
-    return JsonResponse({'success': False})
-
-@login_required
-@user_passes_test(is_admin)
-def toggle_registration_attendance(request, registration_id):
-    """Toggle registration attendance"""
-    if request.method == 'POST':
-        registration = get_object_or_404(EventRegistration, id=registration_id)
-        registration.attended = not registration.attended
-        registration.save()
-        return JsonResponse({
-            'success': True,
-            'attended': registration.attended,
-            'message': 'Marked as attended' if registration.attended else 'Marked as not attended'
         })
     return JsonResponse({'success': False})
 
