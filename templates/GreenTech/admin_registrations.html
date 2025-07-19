@@ -1,0 +1,102 @@
+{% extends 'GreenTech/base.html' %}
+{% load static %}
+
+{% block title %}Admin - View Registrations{% endblock %}
+
+{% block main_navbar %}
+{% include 'GreenTech/admin_nav.html' %}
+{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/9.1.0/mdb.min.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/dash.css' %}">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Outfit:wght@100..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div id="attendance-error" class="alert alert-danger d-none" role="alert"></div>
+    <div class="admin-header mb-4">
+        <h1 class="admin-title">Event Registrations</h1>
+        <p class="admin-subtitle">View and manage all event registrations</p>
+    </div>
+    <form method="get" class="row g-3 mb-4">
+        <div class="col-md-3">
+            <input type="text" name="search" class="form-control" placeholder="Search by user, event, email..." value="{{ search_query }}">
+        </div>
+        <div class="col-md-2">
+            <select name="event_type" class="form-select">
+                <option value="">Event Type</option>
+                {% for type_code, type_name in event_types %}
+                <option value="{{ type_code }}" {% if event_type == type_code %}selected{% endif %}>{{ type_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Filter</button>
+        </div>
+        <div class="col-md-2">
+            <a href="{% url 'admin_registrations' %}" class="btn btn-secondary w-100">Clear</a>
+        </div>
+    </form>
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Event</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for reg in page_obj %}
+                        <tr>
+                            <td>{{ reg.user.get_full_name|default:reg.user.username }}</td>
+                            <td>{{ reg.user.email }}</td>
+                            <td>{{ reg.event.title }}</td>
+                            <td>{{ reg.registered_at|date:"M d, Y H:i" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-center">No registrations found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% if page_obj.has_other_pages %}
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // The attendance toggle functionality is removed, so this script block is no longer needed.
+    });
+</script>
+{% endblock %} 
