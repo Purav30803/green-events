@@ -16,80 +16,138 @@
                     
                     <form method="post">
                         {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="Name" class="form-label">Username *</label>
+                                <label for="{{ form.username.id_for_label }}" class="form-label">Username *</label>
                                 <div class="input-group">
                                     <span class="input-group-text">
                                         <i class="bi bi-person"></i>
                                     </span>
-                                    <input type="text" class="form-control" id="Name" name="Name" required>
+                                    {{ form.username }}
                                 </div>
+                                {% if form.username.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.username.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
                             
                             <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label">Email *</label>
+                                <label for="{{ form.email.id_for_label }}" class="form-label">Email *</label>
                                 <div class="input-group">
                                     <span class="input-group-text">
                                         <i class="bi bi-envelope"></i>
                                     </span>
-                                    <input type="email" class="form-control" id="email" name="email" required>
+                                    {{ form.email }}
                                 </div>
+                                {% if form.email.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.email.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                         
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="password" class="form-label">Password *</label>
+                                <label for="{{ form.password1.id_for_label }}" class="form-label">Password *</label>
                                 <div class="input-group">
                                     <span class="input-group-text">
                                         <i class="bi bi-lock"></i>
                                     </span>
-                                    <input type="password" class="form-control" id="password" name="password" required>
+                                    {{ form.password1 }}
                                 </div>
+                                {% if form.password1.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.password1.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
                             
                             <div class="col-md-6 mb-3">
-                                <label for="confirm_password" class="form-label">Confirm Password *</label>
+                                <label for="{{ form.password2.id_for_label }}" class="form-label">Confirm Password *</label>
                                 <div class="input-group">
                                     <span class="input-group-text">
                                         <i class="bi bi-lock-fill"></i>
                                     </span>
-                                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                                    {{ form.password2 }}
                                 </div>
+                                {% if form.password2.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.password2.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                         
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="address" class="form-label">Address</label>
+                                <label for="{{ form.address.id_for_label }}" class="form-label">Address</label>
                                 <div class="input-group">
                                     <span class="input-group-text">
                                         <i class="bi bi-geo-alt"></i>
                                     </span>
-                                    <input type="text" class="form-control" id="address" name="address" placeholder="Your address">
+                                    {{ form.address }}
                                 </div>
+                                {% if form.address.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.address.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
                             
                             <div class="col-md-6 mb-3">
-                                <label for="number" class="form-label">Phone Number</label>
+                                <label for="{{ form.phone_number.id_for_label }}" class="form-label">Phone Number</label>
                                 <div class="input-group">
                                     <span class="input-group-text">
                                         <i class="bi bi-telephone"></i>
                                     </span>
-                                    <input type="tel" class="form-control" id="number" name="number" placeholder="Your phone number">
+                                    {{ form.phone_number }}
                                 </div>
+                                {% if form.phone_number.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.phone_number.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                         
                         <div class="mb-4">
-                            <label for="age" class="form-label">Age</label>
+                            <label for="{{ form.age.id_for_label }}" class="form-label">Age</label>
                             <div class="input-group">
                                 <span class="input-group-text">
                                     <i class="bi bi-calendar"></i>
                                 </span>
-                                <input type="number" class="form-control" id="age" name="age" placeholder="Your age" min="1" max="120">
+                                {{ form.age }}
                             </div>
+                            {% if form.age.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.age.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
                         
                         <div class="d-grid">
@@ -101,7 +159,7 @@
                     
                     <div class="text-center mt-4">
                         <p class="text-muted">Already have an account? 
-                            <a href="{% url 'signin' %}" class="text-success text-decoration-none">Sign in here</a>
+                            <a href="{% url 'signin' %}" class="text-success fw-bold">Sign In</a>
                         </p>
                     </div>
                 </div>

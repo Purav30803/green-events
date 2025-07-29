@@ -23,6 +23,11 @@ from Iads import settings
 from Iads.tokens import generate_token
 from .decorators import *
 from .models import Event, EventRegistration, UserProfile, Contact, VisitorCount
+from .forms import (
+    UserRegistrationForm, UserLoginForm, UserProfileEditForm, ContactForm,
+    EventCreationForm, EventRegistrationForm, ContactStatusUpdateForm,
+    EventSearchForm, UserSearchForm, ContactSearchForm
+)
 
 
 # Mixins
@@ -263,7 +268,8 @@ class EditProfileView(LoginRequiredMixin, View):
         except UserProfile.DoesNotExist:
             profile = UserProfile.objects.create(user=request.user)
         
-        return render(request, self.template_name, {'profile': profile})
+        form = UserProfileEditForm(instance=profile)
+        return render(request, self.template_name, {'form': form, 'profile': profile})
     
     def post(self, request):
         try:
@@ -271,17 +277,13 @@ class EditProfileView(LoginRequiredMixin, View):
         except UserProfile.DoesNotExist:
             profile = UserProfile.objects.create(user=request.user)
         
-        profile.address = request.POST.get('address', '')
-        profile.phone_number = request.POST.get('phone_number', '')
-        profile.age = request.POST.get('age') or None
-        profile.bio = request.POST.get('bio', '')
-        
-        if 'profile_picture' in request.FILES:
-            profile.profile_picture = request.FILES['profile_picture']
-        
-        profile.save()
-        messages.success(request, "Profile updated successfully!")
-        return redirect('user_profile')
+        form = UserProfileEditForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Profile updated successfully!")
+            return redirect('user_profile')
+        else:
+            return render(request, self.template_name, {'form': form, 'profile': profile})
 
 
 # Authentication Views
@@ -289,92 +291,83 @@ class SignupView(View):
     template_name = "GreenTech/signup.html"
     
     def get(self, request):
-        return render(request, self.template_name)
+        form = UserRegistrationForm()
+        return render(request, self.template_name, {'form': form})
     
     def post(self, request):
-        Name = request.POST['Name']
-        email = request.POST['email']
-        password = request.POST['password']
-        confirm_password = request.POST['confirm_password']
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            myuser = form.save(commit=False)
+            myuser.first_name = myuser.username
+            myuser.is_active = False
+            myuser.save()
+            
+            # Create user profile (already done in form.save())
+            profile = UserProfile.objects.get(user=myuser)
+            profile.address = form.cleaned_data.get('address', '')
+            profile.phone_number = form.cleaned_data.get('phone_number', '')
+            profile.age = form.cleaned_data.get('age')
+            profile.save()
 
-        if User.objects.filter(username=Name):
-            messages.error(request, "Username already exists", extra_tags="validation")
-            return redirect('/signup')
+            messages.success(request, "Your account has been successfully created. Check mail to verify.",
+                             extra_tags="valid")
 
-        if User.objects.filter(email=email):
-            messages.error(request, "Email already exists", extra_tags="validation")
-            return redirect('/signup')
+            # welcome email
+            subject = "Welcome to Green Events & Volunteering Portal"
+            message = f"Hi {myuser.first_name}! Welcome to Green Events & Volunteering Portal!!!\nWe are glad to have you here!!!\nWe have sent you a confirmation email to {myuser.email}.\nPlease confirm your email to continue using our services.\n\nThank You!!!"
+            from_email = settings.EMAIL_HOST_USER
+            to_list = [myuser.email]
+            send_mail(subject, message, from_email, to_list, fail_silently=True)
 
-        if password != confirm_password:
-            messages.error(request, "Password does not match", extra_tags="validation")
-            return redirect('/signup')
+            # confirmation email
+            current_site = get_current_site(request)
+            email_subject = "Confirm your email"
+            message2 = render_to_string('email_confirmation.html', {
+                'name': myuser.first_name,
+                'domain': current_site.domain,
+                'uid': urlsafe_base64_encode(force_bytes(myuser.pk)),
+                'token': generate_token.make_token(myuser)
+            })
+            email = EmailMessage(
+                email_subject,
+                message2,
+                settings.EMAIL_HOST_USER,
+                [myuser.email]
+            )
+            email.fail_silently = True
+            email.send()
 
-        if not Name.isalnum():
-            messages.error(request, "Username should only contain letters and numbers", extra_tags="validation")
-            return redirect('/signup')
-
-        myuser = User.objects.create_user(Name, email, password)
-        myuser.first_name = Name
-        myuser.email = email
-        myuser.is_active = False
-        myuser.save()
-        
-        # Create user profile
-        UserProfile.objects.create(user=myuser)
-
-        messages.success(request, "Your account has been successfully created. Check mail to verify.",
-                         extra_tags="valid")
-
-        # welcome email
-        subject = "Welcome to Green Events & Volunteering Portal"
-        message = f"Hi {myuser.first_name}! Welcome to Green Events & Volunteering Portal!!!\nWe are glad to have you here!!!\nWe have sent you a confirmation email to {myuser.email}.\nPlease confirm your email to continue using our services.\n\nThank You!!!"
-        from_email = settings.EMAIL_HOST_USER
-        to_list = [myuser.email]
-        send_mail(subject, message, from_email, to_list, fail_silently=True)
-
-        # confirmation email
-        current_site = get_current_site(request)
-        email_subject = "Confirm your email"
-        message2 = render_to_string('email_confirmation.html', {
-            'name': myuser.first_name,
-            'domain': current_site.domain,
-            'uid': urlsafe_base64_encode(force_bytes(myuser.pk)),
-            'token': generate_token.make_token(myuser)
-        })
-        email = EmailMessage(
-            email_subject,
-            message2,
-            settings.EMAIL_HOST_USER,
-            [myuser.email]
-        )
-        email.fail_silently = True
-        email.send()
-
-        return redirect('/')
+            return redirect('/')
+        else:
+            return render(request, self.template_name, {'form': form})
 
 
 class SigninView(View):
     template_name = "GreenTech/signin.html"
     
     def get(self, request):
-        return render(request, self.template_name)
+        form = UserLoginForm()
+        return render(request, self.template_name, {'form': form})
     
     def post(self, request):
-        Name = request.POST['Name']
-        password = request.POST['Password']
-        user = authenticate(username=Name, password=password)
-        
-        if user is not None:
-            login(request, user)
-            return redirect('/')
-        else:
-            validate = User.objects.filter(username=Name).exists()
-            if validate:
-                messages.error(request, "Invalid Password", extra_tags="pass")
-                return redirect('/signin')
+        form = UserLoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(username=username, password=password)
+            
+            if user is not None:
+                login(request, user)
+                return redirect('/')
             else:
-                messages.error(request, "Invalid Username", extra_tags="user")
-                return redirect('/signin')
+                validate = User.objects.filter(username=username).exists()
+                if validate:
+                    messages.error(request, "Invalid Password", extra_tags="pass")
+                else:
+                    messages.error(request, "Invalid Username", extra_tags="user")
+                return render(request, self.template_name, {'form': form})
+        else:
+            return render(request, self.template_name, {'form': form})
 
 
 class SignoutView(View):
@@ -522,38 +515,19 @@ class AdminCreateEventView(LoginRequiredMixin, AdminRequiredMixin, TemplateView)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['event_types'] = Event.EVENT_TYPES
+        context['form'] = EventCreationForm()
         return context
     
     def post(self, request):
-        try:
-            event = Event.objects.create(
-                title=request.POST.get('title'),
-                description=request.POST.get('description'),
-                event_type=request.POST.get('event_type'),
-                location=request.POST.get('location'),
-                date=request.POST.get('date'),
-                start_time=request.POST.get('start_time'),
-                end_time=request.POST.get('end_time'),
-                max_participants=request.POST.get('max_participants'),
-                organizer=request.user,
-                is_active=request.POST.get('is_active') == 'on'
-            )
-            
-            # Handle coordinates
-            latitude = request.POST.get('latitude')
-            longitude = request.POST.get('longitude')
-            if latitude and longitude:
-                event.latitude = float(latitude)
-                event.longitude = float(longitude)
-                event.save()
-            
-            messages.success(request, 'Event created successfully!')
+        form = EventCreationForm(request.POST, request.FILES)
+        if form.is_valid():
+            event = form.save(commit=False)
+            event.organizer = request.user
+            event.save()
+            messages.success(request, f'Event "{event.title}" created successfully!')
             return redirect('admin_events')
-        except Exception as e:
-            messages.error(request, f'Error creating event: {str(e)}')
-        
-        return self.get(request)
+        else:
+            return render(request, self.template_name, {'form': form})
 
 
 class AdminDeleteEventView(LoginRequiredMixin, AdminRequiredMixin, DeleteView):
@@ -710,38 +684,17 @@ class ContactView(View):
     template_name = "GreenTech/contact.html"
     
     def get(self, request):
-        return render(request, self.template_name)
+        form = ContactForm()
+        return render(request, self.template_name, {'form': form})
     
     def post(self, request):
-        try:
-            contact = Contact.objects.create(
-                name=request.POST.get('name'),
-                email=request.POST.get('email'),
-                phone_number=request.POST.get('phone_number', ''),
-                contact_type=request.POST.get('contact_type', 'general_inquiry'),
-                subject=request.POST.get('subject'),
-                message=request.POST.get('message')
-            )
-            
-            # Handle event creation request fields
-            if request.POST.get('contact_type') == 'event_request':
-                contact.event_title = request.POST.get('event_title')
-                contact.event_type = request.POST.get('event_type')
-                contact.event_date = request.POST.get('event_date')
-                contact.event_time = request.POST.get('event_time')
-                contact.event_location = request.POST.get('event_location')
-                contact.max_participants = request.POST.get('max_participants') or None
-                contact.event_description = request.POST.get('event_description')
-                contact.organizer_name = request.POST.get('organizer_name')
-                contact.organizer_phone = request.POST.get('organizer_phone')
-                contact.special_requirements = request.POST.get('special_requirements')
-                contact.save()
-            
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            form.save()
             messages.success(request, "Thank you for your message! We'll get back to you soon.")
             return redirect('contact')
-        except Exception as e:
-            messages.error(request, "There was an error submitting your message. Please try again.")
-            return render(request, self.template_name)
+        else:
+            return render(request, self.template_name, {'form': form})
 
 
 class AdminContactsView(LoginRequiredMixin, AdminRequiredMixin, ListView):
@@ -798,14 +751,18 @@ class AdminContactDetailView(LoginRequiredMixin, AdminRequiredMixin, DetailView)
     
     def post(self, request, pk):
         contact = self.get_object()
-        
-        # Update contact status and admin notes
-        contact.status = request.POST.get('status')
-        contact.admin_notes = request.POST.get('admin_notes', '')
-        contact.save()
-        
-        messages.success(request, 'Contact query updated successfully!')
-        return redirect('admin_contacts')
+        form = ContactStatusUpdateForm(request.POST, instance=contact)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Contact query updated successfully!')
+            return redirect('admin_contacts')
+        else:
+            return render(request, self.template_name, {
+                'contact': contact,
+                'form': form,
+                'contact_types': Contact.CONTACT_TYPES,
+                'status_choices': Contact.STATUS_CHOICES
+            })
 
 
 class UpdateContactStatusView(LoginRequiredMixin, AdminRequiredMixin, View):

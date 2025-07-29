@@ -17,6 +17,14 @@
                     <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
                         
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
                         <!-- Profile Picture -->
                         <div class="text-center mb-4">
                             {% if profile.profile_picture %}
@@ -28,53 +36,84 @@
                             {% endif %}
                             
                             <div class="mb-3">
-                                <label for="profile_picture" class="form-label">Profile Picture</label>
-                                <input type="file" class="form-control" id="profile_picture" name="profile_picture" accept="image/*">
+                                <label for="{{ form.profile_picture.id_for_label }}" class="form-label">Profile Picture</label>
+                                {{ form.profile_picture }}
                                 <div class="form-text">Upload a new profile picture (optional)</div>
+                                {% if form.profile_picture.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.profile_picture.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                         
                         <!-- Personal Information -->
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="address" class="form-label">Address</label>
+                                <label for="{{ form.address.id_for_label }}" class="form-label">Address</label>
                                 <div class="input-group">
                                     <span class="input-group-text">
                                         <i class="bi bi-geo-alt"></i>
                                     </span>
-                                    <input type="text" class="form-control" id="address" name="address" 
-                                           value="{{ profile.address|default:'' }}" placeholder="Your address">
+                                    {{ form.address }}
                                 </div>
+                                {% if form.address.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.address.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
                             
                             <div class="col-md-6 mb-3">
-                                <label for="phone_number" class="form-label">Phone Number</label>
+                                <label for="{{ form.phone_number.id_for_label }}" class="form-label">Phone Number</label>
                                 <div class="input-group">
                                     <span class="input-group-text">
                                         <i class="bi bi-telephone"></i>
                                     </span>
-                                    <input type="tel" class="form-control" id="phone_number" name="phone_number" 
-                                           value="{{ profile.phone_number|default:'' }}" placeholder="Your phone number">
+                                    {{ form.phone_number }}
                                 </div>
+                                {% if form.phone_number.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.phone_number.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                         
                         <div class="mb-3">
-                            <label for="age" class="form-label">Age</label>
+                            <label for="{{ form.age.id_for_label }}" class="form-label">Age</label>
                             <div class="input-group">
                                 <span class="input-group-text">
                                     <i class="bi bi-calendar"></i>
                                 </span>
-                                <input type="number" class="form-control" id="age" name="age" 
-                                       value="{{ profile.age|default:'' }}" placeholder="Your age" min="1" max="120">
+                                {{ form.age }}
                             </div>
+                            {% if form.age.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.age.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
                         
                         <div class="mb-4">
-                            <label for="bio" class="form-label">Bio</label>
-                            <textarea class="form-control" id="bio" name="bio" rows="4" 
-                                      placeholder="Tell us about yourself...">{{ profile.bio|default:'' }}</textarea>
+                            <label for="{{ form.bio.id_for_label }}" class="form-label">Bio</label>
+                            {{ form.bio }}
                             <div class="form-text">Share a bit about yourself and your interests in environmental conservation.</div>
+                            {% if form.bio.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.bio.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
                         
                         <div class="d-flex gap-3">
