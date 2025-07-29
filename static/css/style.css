@@ -70,3 +70,47 @@
 .active{
     font-weight: 700;
 }
+
+/* Visitor Counter Styles */
+.visitor-counter {
+    text-align: center;
+}
+
+.visitor-counter .display-6 {
+    font-size: 3rem;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.visitor-counter small {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Animation for visitor counter */
+@keyframes countUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.visitor-counter .display-6 {
+    animation: countUp 1s ease-out;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .visitor-counter .display-6 {
+        font-size: 2.5rem;
+    }
+    
+    .visitor-counter small {
+        font-size: 0.75rem;
+    }
+}

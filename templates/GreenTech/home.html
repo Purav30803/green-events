@@ -28,41 +28,6 @@
     </div>
 </section>
 
-<!-- Statistics Section -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="row text-center">
-            <div class="col-md-4 mb-4">
-                <div class="card stats-card h-100">
-                    <div class="card-body">
-                        <i class="bi bi-calendar-check text-success" style="font-size: 3rem;"></i>
-                        <h3 class="mt-3">{{ total_events }}</h3>
-                        <p class="text-muted">Total Events</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card stats-card h-100">
-                    <div class="card-body">
-                        <i class="bi bi-people-fill text-success" style="font-size: 3rem;"></i>
-                        <h3 class="mt-3">{{ total_participants }}</h3>
-                        <p class="text-muted">Volunteers</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card stats-card h-100">
-                    <div class="card-body">
-                        <i class="bi bi-geo-alt-fill text-success" style="font-size: 3rem;"></i>
-                        <h3 class="mt-3">50+</h3>
-                        <p class="text-muted">Locations</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
 <!-- Upcoming Events Section -->
 <section class="py-5">
     <div class="container">
@@ -135,6 +100,26 @@
                 <p class="text-muted">Check back later for new events!</p>
             </div>
         {% endif %}
+    </div>
+</section>
+
+<!-- Visitor Counter Section -->
+<section class="py-4 bg-success text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h4 class="mb-2">
+                    <i class="bi bi-eye-fill me-2"></i>Total Visitors
+                </h4>
+                <p class="mb-0 opacity-75">Join our growing community of eco-conscious individuals!</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <div class="visitor-counter">
+                    <span class="display-6 fw-bold">{{ total_visitors|default:"0" }}</span>
+                    <small class="d-block opacity-75">Unique Visitors</small>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 {% endblock %} 

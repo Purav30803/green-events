@@ -22,7 +22,7 @@ from datetime import date
 from Iads import settings
 from Iads.tokens import generate_token
 from .decorators import *
-from .models import Event, EventRegistration, UserProfile, Contact
+from .models import Event, EventRegistration, UserProfile, Contact, VisitorCount
 
 
 # Mixins
@@ -37,6 +37,10 @@ class HomeView(TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        
+        # Track visitor using session and cookies
+        self.track_visitor()
+        
         # Get upcoming events
         context['upcoming_events'] = Event.objects.filter(
             date__gte=date.today(),
@@ -47,7 +51,51 @@ class HomeView(TemplateView):
         context['total_events'] = Event.objects.filter(is_active=True).count()
         context['total_participants'] = EventRegistration.objects.count()
         
+        # Get visitor count
+        visitor_count = VisitorCount.get_or_create_singleton()
+        context['total_visitors'] = visitor_count.total_visitors
+        
         return context
+    
+    def track_visitor(self):
+        """Track unique visitors using session and cookies"""
+        # Check if this is a new visitor using session
+        session_key = 'has_visited'
+        cookie_key = 'visitor_id'
+        
+        # Check if user has already been counted in this session
+        if not self.request.session.get(session_key):
+            # Check if user has a visitor cookie
+            visitor_id = self.request.COOKIES.get(cookie_key)
+            
+            if not visitor_id:
+                # This is a new unique visitor
+                # Generate a unique visitor ID
+                import uuid
+                visitor_id = str(uuid.uuid4())
+                
+                # Increment the visitor count
+                VisitorCount.increment_visitor_count()
+                
+                # Mark as visited in session
+                self.request.session[session_key] = True
+                
+                # Set cookie to track this visitor (expires in 1 year)
+                self.request.session['set_visitor_cookie'] = visitor_id
+            else:
+                # User has a cookie, mark as visited in session
+                self.request.session[session_key] = True
+    
+    def dispatch(self, request, *args, **kwargs):
+        """Override dispatch to set cookies in response"""
+        response = super().dispatch(request, *args, **kwargs)
+        
+        # Set visitor cookie if needed
+        if request.session.get('set_visitor_cookie'):
+            visitor_id = request.session.pop('set_visitor_cookie')
+            response.set_cookie('visitor_id', visitor_id, max_age=365*24*60*60)  # 1 year
+        
+        return response
 
 
 # About Us View

@@ -2,7 +2,7 @@
 # All admin functionality is now handled by custom views in views.py
 
 from django.contrib import admin
-from .models import Event, EventRegistration, UserProfile, Contact
+from .models import Event, EventRegistration, UserProfile, Contact, VisitorCount
 
 @admin.register(Contact)
 class ContactAdmin(admin.ModelAdmin):
@@ -50,3 +50,16 @@ class ContactAdmin(admin.ModelAdmin):
                 'description': 'These fields are only used for Event Creation Requests'
             })
             return fieldsets
+
+@admin.register(VisitorCount)
+class VisitorCountAdmin(admin.ModelAdmin):
+    list_display = ('total_visitors', 'last_updated')
+    readonly_fields = ('total_visitors', 'last_updated')
+    
+    def has_add_permission(self, request):
+        # Only allow one instance
+        return not VisitorCount.objects.exists()
+    
+    def has_delete_permission(self, request, obj=None):
+        # Don't allow deletion
+        return False

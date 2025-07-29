@@ -44,7 +44,6 @@
         </div>
 
         <div class="admin-nav-user">
-            <span>Welcome, {{ user.get_full_name|default:user.username }}</span>
             <a href="{% url 'home' %}" class="admin-nav-link">View Site</a>
             <a href="{% url 'signout' %}" class="admin-nav-link">Logout</a>
         </div>

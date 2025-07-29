@@ -163,3 +163,30 @@ class Contact(models.Model):
     class Meta:
         ordering = ['-created_at']
 
+
+class VisitorCount(models.Model):
+    """Model to store the total count of unique visitors"""
+    total_visitors = models.IntegerField(default=0)
+    last_updated = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Visitor Count"
+        verbose_name_plural = "Visitor Count"
+    
+    def __str__(self):
+        return f"Total Visitors: {self.total_visitors}"
+    
+    @classmethod
+    def get_or_create_singleton(cls):
+        """Get or create the single visitor count instance"""
+        obj, created = cls.objects.get_or_create(id=1, defaults={'total_visitors': 0})
+        return obj
+    
+    @classmethod
+    def increment_visitor_count(cls):
+        """Increment the visitor count by 1"""
+        visitor_count = cls.get_or_create_singleton()
+        visitor_count.total_visitors += 1
+        visitor_count.save()
+        return visitor_count.total_visitors
+

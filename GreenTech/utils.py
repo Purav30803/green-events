@@ -48,3 +48,9 @@ def get_event_type_color(event_type):
     }
     
     return event_type_colors.get(event_type, event_type_colors['other']) 
+
+def get_visitor_count():
+    """Get the current visitor count"""
+    from .models import VisitorCount
+    visitor_count = VisitorCount.get_or_create_singleton()
+    return visitor_count.total_visitors 
