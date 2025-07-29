@@ -5,6 +5,7 @@ from . import views
 urlpatterns = [
     path('', views.HomeView.as_view(), name='home'),
     path('about/', views.AboutView.as_view(), name='about'),
+    path('contact/', views.ContactView.as_view(), name='contact'),
     path('events/', views.EventsListView.as_view(), name='events'),
     path('event/<int:pk>/', views.EventDetailView.as_view(), name='event_detail'),
     path('event/<int:event_id>/register/', views.RegisterForEventView.as_view(), name='register_for_event'),
@@ -25,8 +26,11 @@ urlpatterns = [
     path('admin/registrations/', views.AdminRegistrationsView.as_view(), name='admin_registrations'),
     path('admin/users/', views.AdminUsersView.as_view(), name='admin_users'),
     path('admin/users/<int:pk>/', views.AdminUserDetailView.as_view(), name='admin_user_detail'),
+    path('admin/contacts/', views.AdminContactsView.as_view(), name='admin_contacts'),
+    path('admin/contacts/<int:pk>/', views.AdminContactDetailView.as_view(), name='admin_contact_detail'),
     
     # AJAX endpoints
     path('admin/events/<int:event_id>/toggle-status/', views.ToggleEventStatusView.as_view(), name='toggle_event_status'),
     path('admin/stats/', views.GetEventStatsView.as_view(), name='get_event_stats'),
+    path('admin/contacts/<int:contact_id>/update-status/', views.UpdateContactStatusView.as_view(), name='update_contact_status'),
 ]

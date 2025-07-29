@@ -1,0 +1,311 @@
+{% extends 'GreenTech/base.html' %}
+
+{% block title %}Admin - Contact Detail{% endblock %}
+
+{% block main_navbar %}
+    {% include 'GreenTech/admin_nav.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="bi bi-envelope-fill text-success me-2"></i>Contact Query Details
+                    </h1>
+                    <p class="text-muted mb-0">View and manage contact inquiry</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'admin_contacts' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-2"></i>Back to Contacts
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <!-- Contact Details Card -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-person-fill text-success me-2"></i>Contact Information
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Name</label>
+                                    <p class="mb-0">{{ contact.name }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Email</label>
+                                    <p class="mb-0">
+                                        <a href="mailto:{{ contact.email }}" class="text-decoration-none">
+                                            {{ contact.email }}
+                                        </a>
+                                    </p>
+                                </div>
+                                {% if contact.phone_number %}
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Phone Number</label>
+                                        <p class="mb-0">
+                                            <a href="tel:{{ contact.phone_number }}" class="text-decoration-none">
+                                                {{ contact.phone_number }}
+                                            </a>
+                                        </p>
+                                    </div>
+                                {% endif %}
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Contact Type</label>
+                                    <p class="mb-0">
+                                        <span class="badge bg-info">{{ contact.get_contact_type_display }}</span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Status</label>
+                                    <p class="mb-0">
+                                        {% if contact.status == 'new' %}
+                                            <span class="badge bg-warning">New</span>
+                                        {% elif contact.status == 'in_progress' %}
+                                            <span class="badge bg-primary">In Progress</span>
+                                        {% elif contact.status == 'resolved' %}
+                                            <span class="badge bg-success">Resolved</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Closed</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Submitted</label>
+                                    <p class="mb-0">{{ contact.created_at|date:"F d, Y \a\t g:i A" }}</p>
+                                </div>
+                                {% if contact.updated_at != contact.created_at %}
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Last Updated</label>
+                                        <p class="mb-0">{{ contact.updated_at|date:"F d, Y \a\t g:i A" }}</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Message Content -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-chat-fill text-success me-2"></i>Message Details
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Subject</label>
+                                <p class="mb-0">{{ contact.subject }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Message</label>
+                                <div class="border rounded p-3 bg-light">
+                                    {{ contact.message|linebreaks }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Event Creation Details (if applicable) -->
+                    {% if contact.is_event_request %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-calendar-event-fill text-success me-2"></i>Event Creation Details
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Event Title</label>
+                                    <p class="mb-0">{{ contact.event_title|default:"Not provided" }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Event Type</label>
+                                    <p class="mb-0">
+                                        {% if contact.event_type %}
+                                            <span class="badge bg-info">{{ contact.get_event_type_display }}</span>
+                                        {% else %}
+                                            Not specified
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Preferred Date</label>
+                                    <p class="mb-0">{{ contact.event_date|date:"F d, Y"|default:"Not specified" }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Preferred Time</label>
+                                    <p class="mb-0">{{ contact.event_time|time:"g:i A"|default:"Not specified" }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Event Location</label>
+                                    <p class="mb-0">{{ contact.event_location|default:"Not specified" }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Expected Participants</label>
+                                    <p class="mb-0">{{ contact.max_participants|default:"Not specified" }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Event Description</label>
+                                <div class="border rounded p-3 bg-light">
+                                    {{ contact.event_description|linebreaks|default:"Not provided" }}
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Organizer Name</label>
+                                    <p class="mb-0">{{ contact.organizer_name|default:"Not provided" }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Organizer Phone</label>
+                                    <p class="mb-0">
+                                        {% if contact.organizer_phone %}
+                                            <a href="tel:{{ contact.organizer_phone }}" class="text-decoration-none">
+                                                {{ contact.organizer_phone }}
+                                            </a>
+                                        {% else %}
+                                            Not provided
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            {% if contact.special_requirements %}
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Special Requirements</label>
+                                <div class="border rounded p-3 bg-light">
+                                    {{ contact.special_requirements|linebreaks }}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-lg-4">
+                    <!-- Status Management -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-gear-fill text-success me-2"></i>Manage Status
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="status" class="form-label fw-bold">Status</label>
+                                    <select class="form-select" id="status" name="status">
+                                        {% for status_code, status_name in status_choices %}
+                                            <option value="{{ status_code }}" {% if contact.status == status_code %}selected{% endif %}>
+                                                {{ status_name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="admin_notes" class="form-label fw-bold">Admin Notes</label>
+                                    <textarea class="form-control" id="admin_notes" name="admin_notes" rows="4" 
+                                              placeholder="Add internal notes about this contact query...">{{ contact.admin_notes }}</textarea>
+                                </div>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="bi bi-save me-2"></i>Update Contact
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-lightning-fill text-success me-2"></i>Quick Actions
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a href="mailto:{{ contact.email }}?subject=Re: {{ contact.subject }}" 
+                                   class="btn btn-outline-primary">
+                                    <i class="bi bi-envelope me-2"></i>Reply via Email
+                                </a>
+                                {% if contact.phone_number %}
+                                    <a href="tel:{{ contact.phone_number }}" class="btn btn-outline-success">
+                                        <i class="bi bi-telephone me-2"></i>Call Contact
+                                    </a>
+                                {% endif %}
+                                <button type="button" class="btn btn-outline-info" onclick="copyToClipboard('{{ contact.email }}')">
+                                    <i class="bi bi-clipboard me-2"></i>Copy Email
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Statistics -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-graph-up text-success me-2"></i>Statistics
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="border-end">
+                                        <h4 class="text-success mb-1">{{ contact.created_at|date:"d" }}</h4>
+                                        <small class="text-muted">{{ contact.created_at|date:"M Y" }}</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div>
+                                        <h4 class="text-primary mb-1">
+                                            {% if contact.status == 'new' %}
+                                                <i class="bi bi-circle"></i>
+                                            {% elif contact.status == 'in_progress' %}
+                                                <i class="bi bi-clock"></i>
+                                            {% elif contact.status == 'resolved' %}
+                                                <i class="bi bi-check-circle"></i>
+                                            {% else %}
+                                                <i class="bi bi-x-circle"></i>
+                                            {% endif %}
+                                        </h4>
+                                        <small class="text-muted">{{ contact.get_status_display }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        alert('Email copied to clipboard!');
+    }, function(err) {
+        console.error('Could not copy text: ', err);
+    });
+}
+</script>
+{% endblock %} 

@@ -1,0 +1,350 @@
+{% extends 'GreenTech/base.html' %}
+
+{% block title %}Contact Us - Green Events & Volunteering Portal{% endblock %}
+
+{% block content %}
+<!-- Contact Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="text-center mb-5">
+                    <h1 class="display-4 fw-bold text-success mb-3">Contact Us</h1>
+                    <p class="lead text-muted">Have a question or want to create an event? We'd love to hear from you!</p>
+                </div>
+                
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card shadow-sm">
+                            <div class="card-body p-4">
+                                <h4 class="card-title mb-4">
+                                    <i class="bi bi-envelope-fill text-success me-2"></i>Send us a Message
+                                </h4>
+                                
+                                <form method="post" id="contactForm">
+                                    {% csrf_token %}
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="name" class="form-label">Full Name *</label>
+                                            <input type="text" class="form-control" id="name" name="name" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="email" class="form-label">Email Address *</label>
+                                            <input type="email" class="form-control" id="email" name="email" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="phone_number" class="form-label">Phone Number</label>
+                                            <input type="tel" class="form-control" id="phone_number" name="phone_number">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="contact_type" class="form-label">Contact Type *</label>
+                                            <select class="form-select" id="contact_type" name="contact_type" required>
+                                                <option value="">Select a type...</option>
+                                                <option value="event_request">Event Creation Request</option>
+                                                <option value="general_inquiry">General Inquiry</option>
+                                                <option value="technical_support">Technical Support</option>
+                                                <option value="feedback">Feedback</option>
+                                                <option value="other">Other</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Event Creation Fields (Hidden by default) -->
+                                    <div id="eventFields" style="display: none;">
+                                        <div class="alert alert-info mb-4">
+                                            <i class="bi bi-info-circle-fill me-2"></i>
+                                            <strong>Event Creation Request:</strong> Please provide details about the event you'd like to organize.
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="event_title" class="form-label">Event Title *</label>
+                                                <input type="text" class="form-control" id="event_title" name="event_title" placeholder="e.g., Community Tree Planting">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="event_type" class="form-label">Event Type *</label>
+                                                <select class="form-select" id="event_type" name="event_type">
+                                                    <option value="">Select event type...</option>
+                                                    <option value="tree_planting">Tree Planting</option>
+                                                    <option value="cleanup">Cleanup</option>
+                                                    <option value="recycling">Recycling</option>
+                                                    <option value="education">Environmental Education</option>
+                                                    <option value="conservation">Wildlife Conservation</option>
+                                                    <option value="other">Other</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="event_date" class="form-label">Preferred Date *</label>
+                                                <input type="date" class="form-control" id="event_date" name="event_date">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="event_time" class="form-label">Preferred Time *</label>
+                                                <input type="time" class="form-control" id="event_time" name="event_time">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="event_location" class="form-label">Event Location *</label>
+                                                <input type="text" class="form-control" id="event_location" name="event_location" placeholder="e.g., Central Park, Downtown">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="max_participants" class="form-label">Expected Participants</label>
+                                                <input type="number" class="form-control" id="max_participants" name="max_participants" placeholder="e.g., 50" min="1" max="1000">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="event_description" class="form-label">Event Description *</label>
+                                            <textarea class="form-control" id="event_description" name="event_description" rows="4" 
+                                                      placeholder="Please describe your event idea, goals, and any specific requirements..."></textarea>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="organizer_name" class="form-label">Organizer Name *</label>
+                                                <input type="text" class="form-control" id="organizer_name" name="organizer_name" placeholder="Your name or organization name">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="organizer_phone" class="form-label">Organizer Phone</label>
+                                                <input type="tel" class="form-control" id="organizer_phone" name="organizer_phone" placeholder="Contact number for coordination">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="special_requirements" class="form-label">Special Requirements</label>
+                                            <textarea class="form-control" id="special_requirements" name="special_requirements" rows="3" 
+                                                      placeholder="Any special equipment, permits, or requirements needed..."></textarea>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="subject" class="form-label">Subject *</label>
+                                        <input type="text" class="form-control" id="subject" name="subject" required>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="message" class="form-label">Message *</label>
+                                        <textarea class="form-control" id="message" name="message" rows="6" required placeholder="Please provide details about your inquiry..."></textarea>
+                                    </div>
+                                    
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-success btn-lg">
+                                            <i class="bi bi-send me-2"></i>Send Message
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body p-4">
+                                <h5 class="card-title mb-4">
+                                    <i class="bi bi-info-circle-fill text-success me-2"></i>Get in Touch
+                                </h5>
+                                
+                                <div class="mb-4">
+                                    <h6 class="fw-bold text-success">Event Creation Requests</h6>
+                                    <p class="text-muted small">Want to organize an environmental event? Fill out the form and we'll help you get started!</p>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <h6 class="fw-bold text-success">Contact Information</h6>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-envelope text-success me-2"></i>
+                                        <span class="small">info@greenevents.com</span>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-telephone text-success me-2"></i>
+                                        <span class="small">+1 (123) 456-7890</span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-geo-alt text-success me-2"></i>
+                                        <span class="small">123 Green Street, Eco City</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <h6 class="fw-bold text-success">Response Time</h6>
+                                    <p class="text-muted small">We typically respond within 24-48 hours during business days.</p>
+                                </div>
+                                
+                                <div class="alert alert-info">
+                                    <i class="bi bi-lightbulb-fill me-2"></i>
+                                    <strong>Tip:</strong> For event creation requests, please include details about the event type, location, and expected date.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="text-center mb-5">Frequently Asked Questions</h2>
+                
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq1">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1">
+                                How can I create an event?
+                            </button>
+                        </h2>
+                        <div id="collapse1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                To create an event, please use the contact form above and select "Event Creation Request" as the contact type. Include details about your event idea, and our team will review and help you set it up.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq2">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2">
+                                What types of events can I organize?
+                            </button>
+                        </h2>
+                        <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                We support various environmental events including tree planting, cleanup drives, recycling initiatives, environmental education, wildlife conservation, and other eco-friendly activities.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq3">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3">
+                                How long does it take to get a response?
+                            </button>
+                        </h2>
+                        <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                We typically respond within 24-48 hours during business days. For urgent matters, please include "URGENT" in your subject line.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq4">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4">
+                                Can I volunteer for events?
+                            </button>
+                        </h2>
+                        <div id="collapse4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Yes! You can browse available events on our Events page and register to participate. Simply create an account and start volunteering for environmental causes.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const contactTypeSelect = document.getElementById('contact_type');
+    const eventFields = document.getElementById('eventFields');
+    const subjectInput = document.getElementById('subject');
+    const messageInput = document.getElementById('message');
+    
+    // Function to show/hide event fields
+    function toggleEventFields() {
+        if (contactTypeSelect.value === 'event_request') {
+            eventFields.style.display = 'block';
+            // Set default subject for event requests
+            if (!subjectInput.value) {
+                subjectInput.value = 'Event Creation Request';
+            }
+            // Set default message template
+            if (!messageInput.value) {
+                messageInput.value = 'I would like to organize an environmental event. Please find the details below:\n\n';
+            }
+        } else {
+            eventFields.style.display = 'none';
+            // Clear event-specific fields
+            clearEventFields();
+        }
+    }
+    
+    // Function to clear event fields
+    function clearEventFields() {
+        const eventInputs = eventFields.querySelectorAll('input, textarea, select');
+        eventInputs.forEach(input => {
+            if (input.type !== 'hidden') {
+                input.value = '';
+            }
+        });
+    }
+    
+    // Event listener for contact type change
+    contactTypeSelect.addEventListener('change', toggleEventFields);
+    
+    // Form submission handler
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+        if (contactTypeSelect.value === 'event_request') {
+            // Validate event fields
+            const requiredFields = [
+                'event_title', 'event_type', 'event_date', 'event_time', 
+                'event_location', 'event_description', 'organizer_name'
+            ];
+            
+            let isValid = true;
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (!field.value.trim()) {
+                    field.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    field.classList.remove('is-invalid');
+                }
+            });
+            
+            if (!isValid) {
+                e.preventDefault();
+                alert('Please fill in all required event fields.');
+                return;
+            }
+            
+            // Combine event details into message
+            const eventDetails = `
+Event Details:
+- Title: ${document.getElementById('event_title').value}
+- Type: ${document.getElementById('event_type').value}
+- Date: ${document.getElementById('event_date').value}
+- Time: ${document.getElementById('event_time').value}
+- Location: ${document.getElementById('event_location').value}
+- Expected Participants: ${document.getElementById('max_participants').value || 'Not specified'}
+- Organizer: ${document.getElementById('organizer_name').value}
+- Organizer Phone: ${document.getElementById('organizer_phone').value || 'Not provided'}
+
+Event Description:
+${document.getElementById('event_description').value}
+
+Special Requirements:
+${document.getElementById('special_requirements').value || 'None specified'}
+
+Additional Message:
+${messageInput.value}
+            `.trim();
+            
+            messageInput.value = eventDetails;
+        }
+    });
+});
+</script>
+{% endblock %} 

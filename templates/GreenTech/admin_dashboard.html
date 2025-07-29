@@ -251,6 +251,14 @@
             <div class="stat-number">{{ total_users }}</div>
             <div class="stat-label">Registered Users</div>
         </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_contacts }}</div>
+            <div class="stat-label">Contact Queries</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ new_contacts }}</div>
+            <div class="stat-label">New Contacts</div>
+        </div>
     </div>
     
     <div class="content-grid">
@@ -308,6 +316,32 @@
                 </div>
             </div>
             {% endfor %}
+
+            <div class="activity-item">
+                <div class="activity-info">
+                    <h4>Recent Contact Queries</h4>
+                    <p>Latest contact queries received</p>
+                </div>
+            </div>
+
+            {% for contact in recent_contacts %}
+            <div class="activity-item">
+                <div class="activity-info">
+                    <h4>{{ contact.name }}</h4>
+                    <p>{{ contact.email }} • {{ contact.subject }}</p>
+                </div>
+                <span class="activity-status {% if contact.status == 'new' %}status-active{% else %}status-inactive{% endif %}">
+                    {{ contact.get_status_display }}
+                </span>
+            </div>
+            {% empty %}
+            <div class="activity-item">
+                <div class="activity-info">
+                    <h4>No contact queries yet</h4>
+                    <p>Users will appear here when they contact you</p>
+                </div>
+            </div>
+            {% endfor %}
         </div>
         
         <div class="admin-nav">
@@ -331,6 +365,11 @@
             <a href="{% url 'admin_users' %}" class="nav-item">
                 <i class="nav-icon">👤</i>
                 Manage Users
+            </a>
+            
+            <a href="{% url 'admin_contacts' %}" class="nav-item">
+                <i class="nav-icon">📧</i>
+                Contact Queries
             </a>
             
             <div class="quick-actions">

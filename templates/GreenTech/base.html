@@ -94,6 +94,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'about' %}">About Us</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'contact' %}">Contact Us</a>
+                    </li>
                 </ul>
                 
                 <ul class="navbar-nav">
@@ -154,6 +157,7 @@
                         <li><a href="{% url 'home' %}" class="text-light">Home</a></li>
                         <li><a href="{% url 'events' %}" class="text-light">Events</a></li>
                         <li><a href="{% url 'about' %}" class="text-light">About Us</a></li>
+                        <li><a href="{% url 'contact' %}" class="text-light">Contact Us</a></li>
                         {% if user.is_authenticated %}
                             <li><a href="{% url 'user_profile' %}" class="text-light">My Profile</a></li>
                         {% else %}

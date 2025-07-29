@@ -22,7 +22,7 @@ from datetime import date
 from Iads import settings
 from Iads.tokens import generate_token
 from .decorators import *
-from .models import Event, EventRegistration, UserProfile
+from .models import Event, EventRegistration, UserProfile, Contact
 
 
 # Mixins
@@ -365,6 +365,8 @@ class AdminDashboardView(LoginRequiredMixin, AdminRequiredMixin, TemplateView):
         context['active_events'] = Event.objects.filter(is_active=True).count()
         context['total_registrations'] = EventRegistration.objects.count()
         context['total_users'] = User.objects.count()
+        context['total_contacts'] = Contact.objects.count()
+        context['new_contacts'] = Contact.objects.filter(status='new').count()
         
         # Recent events
         context['recent_events'] = Event.objects.order_by('-created_at')[:5]
@@ -379,6 +381,9 @@ class AdminDashboardView(LoginRequiredMixin, AdminRequiredMixin, TemplateView):
         context['recent_registrations'] = EventRegistration.objects.select_related(
             'user', 'event'
         ).order_by('-registered_at')[:10]
+        
+        # Recent contacts
+        context['recent_contacts'] = Contact.objects.order_by('-created_at')[:5]
         
         return context
 
@@ -649,4 +654,127 @@ class GetEventStatsView(LoginRequiredMixin, AdminRequiredMixin, View):
             'total_registrations': total_registrations,
             'attended_registrations': attended_registrations,
             'events_by_type': list(events_by_type),
+        })
+
+
+# Contact Views
+class ContactView(View):
+    template_name = "GreenTech/contact.html"
+    
+    def get(self, request):
+        return render(request, self.template_name)
+    
+    def post(self, request):
+        try:
+            contact = Contact.objects.create(
+                name=request.POST.get('name'),
+                email=request.POST.get('email'),
+                phone_number=request.POST.get('phone_number', ''),
+                contact_type=request.POST.get('contact_type', 'general_inquiry'),
+                subject=request.POST.get('subject'),
+                message=request.POST.get('message')
+            )
+            
+            # Handle event creation request fields
+            if request.POST.get('contact_type') == 'event_request':
+                contact.event_title = request.POST.get('event_title')
+                contact.event_type = request.POST.get('event_type')
+                contact.event_date = request.POST.get('event_date')
+                contact.event_time = request.POST.get('event_time')
+                contact.event_location = request.POST.get('event_location')
+                contact.max_participants = request.POST.get('max_participants') or None
+                contact.event_description = request.POST.get('event_description')
+                contact.organizer_name = request.POST.get('organizer_name')
+                contact.organizer_phone = request.POST.get('organizer_phone')
+                contact.special_requirements = request.POST.get('special_requirements')
+                contact.save()
+            
+            messages.success(request, "Thank you for your message! We'll get back to you soon.")
+            return redirect('contact')
+        except Exception as e:
+            messages.error(request, "There was an error submitting your message. Please try again.")
+            return render(request, self.template_name)
+
+
+class AdminContactsView(LoginRequiredMixin, AdminRequiredMixin, ListView):
+    model = Contact
+    template_name = 'GreenTech/admin_contacts.html'
+    context_object_name = 'page_obj'
+    paginate_by = 20
+    
+    def get_queryset(self):
+        queryset = Contact.objects.all().order_by('-created_at')
+        
+        # Search functionality
+        search_query = self.request.GET.get('search', '')
+        if search_query:
+            queryset = queryset.filter(
+                Q(name__icontains=search_query) |
+                Q(email__icontains=search_query) |
+                Q(subject__icontains=search_query) |
+                Q(message__icontains=search_query)
+            )
+        
+        # Filter by contact type
+        contact_type = self.request.GET.get('contact_type', '')
+        if contact_type:
+            queryset = queryset.filter(contact_type=contact_type)
+        
+        # Filter by status
+        status = self.request.GET.get('status', '')
+        if status:
+            queryset = queryset.filter(status=status)
+        
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_query'] = self.request.GET.get('search', '')
+        context['contact_type'] = self.request.GET.get('contact_type', '')
+        context['status'] = self.request.GET.get('status', '')
+        context['contact_types'] = Contact.CONTACT_TYPES
+        context['status_choices'] = Contact.STATUS_CHOICES
+        return context
+
+
+class AdminContactDetailView(LoginRequiredMixin, AdminRequiredMixin, DetailView):
+    model = Contact
+    template_name = 'GreenTech/admin_contact_detail.html'
+    context_object_name = 'contact'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['contact_types'] = Contact.CONTACT_TYPES
+        context['status_choices'] = Contact.STATUS_CHOICES
+        return context
+    
+    def post(self, request, pk):
+        contact = self.get_object()
+        
+        # Update contact status and admin notes
+        contact.status = request.POST.get('status')
+        contact.admin_notes = request.POST.get('admin_notes', '')
+        contact.save()
+        
+        messages.success(request, 'Contact query updated successfully!')
+        return redirect('admin_contacts')
+
+
+class UpdateContactStatusView(LoginRequiredMixin, AdminRequiredMixin, View):
+    def post(self, request, contact_id):
+        contact = get_object_or_404(Contact, id=contact_id)
+        new_status = request.POST.get('status')
+        
+        if new_status in dict(Contact.STATUS_CHOICES):
+            contact.status = new_status
+            contact.save()
+            return JsonResponse({
+                'success': True,
+                'status': contact.get_status_display(),
+                'message': f'Status updated to {contact.get_status_display()}'
+            })
+        
+        return JsonResponse({
+            'success': False,
+            'message': 'Invalid status'
         })

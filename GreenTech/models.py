@@ -113,3 +113,53 @@ class EventRegistration(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.event.title}"
 
+
+class Contact(models.Model):
+    CONTACT_TYPES = [
+        ('event_request', 'Event Creation Request'),
+        ('general_inquiry', 'General Inquiry'),
+        ('technical_support', 'Technical Support'),
+        ('feedback', 'Feedback'),
+        ('other', 'Other'),
+    ]
+    
+    STATUS_CHOICES = [
+        ('new', 'New'),
+        ('in_progress', 'In Progress'),
+        ('resolved', 'Resolved'),
+        ('closed', 'Closed'),
+    ]
+    
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
+    contact_type = models.CharField(max_length=20, choices=CONTACT_TYPES, default='general_inquiry')
+    subject = models.CharField(max_length=200)
+    message = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    admin_notes = models.TextField(blank=True, null=True)
+    
+    # Event Creation Request Fields
+    event_title = models.CharField(max_length=200, blank=True, null=True)
+    event_type = models.CharField(max_length=20, choices=Event.EVENT_TYPES, blank=True, null=True)
+    event_date = models.DateField(blank=True, null=True)
+    event_time = models.TimeField(blank=True, null=True)
+    event_location = models.CharField(max_length=200, blank=True, null=True)
+    max_participants = models.IntegerField(blank=True, null=True)
+    event_description = models.TextField(blank=True, null=True)
+    organizer_name = models.CharField(max_length=100, blank=True, null=True)
+    organizer_phone = models.CharField(max_length=15, blank=True, null=True)
+    special_requirements = models.TextField(blank=True, null=True)
+    
+    def __str__(self):
+        return f"{self.name} - {self.subject} ({self.get_status_display()})"
+    
+    @property
+    def is_event_request(self):
+        return self.contact_type == 'event_request'
+    
+    class Meta:
+        ordering = ['-created_at']
+
