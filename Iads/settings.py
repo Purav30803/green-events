@@ -11,12 +11,15 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
 
+load_dotenv()  # Load environment variables from a .env file
 EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'shahpurav308@gmail.com'
-EMAIL_HOST_PASSWORD = 'lpkg bbsf bkou plkl'
-EMAIL_PORT = 587
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_PORT = os.getenv('EMAIL_PORT')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -83,12 +86,12 @@ WSGI_APPLICATION = 'Iads.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'neondb',
-        'USER': 'neondb_owner',
-        'PASSWORD': 'npg_GRZc98womBrS',
-        'HOST': 'ep-flat-wind-aenh6rup-pooler.c-2.us-east-2.aws.neon.tech',  # e.g. 'ep-xxx.us-east-2.aws.neon.tech'
-        'PORT': '5432',
+        'ENGINE':os.getenv('DB_ENGINE'),
+        'NAME':os.getenv('DB_NAME'),
+        'USER':os.getenv('DB_USER'),
+        'PASSWORD':os.getenv('DB_PASSWORD'),
+        'HOST':os.getenv('DB_HOST'),
+        'PORT':os.getenv('DB_PORT'),
         'OPTIONS': {
             'sslmode': 'require',
         },
