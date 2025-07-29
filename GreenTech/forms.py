@@ -511,4 +511,58 @@ class ContactSearchForm(forms.Form):
         if date_from and date_to and date_from > date_to:
             raise ValidationError('Start date must be before or equal to end date.')
         
+        return cleaned_data
+
+
+# Password Reset Forms
+class PasswordResetRequestForm(forms.Form):
+    """Form for requesting password reset"""
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your email address'
+        })
+    )
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if not User.objects.filter(email=email).exists():
+            raise ValidationError('No user found with this email address.')
+        return email
+
+
+class SetNewPasswordForm(forms.Form):
+    """Form for setting new password"""
+    password1 = forms.CharField(
+        label='New Password',
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your new password'
+        })
+    )
+    password2 = forms.CharField(
+        label='Confirm New Password',
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Confirm your new password'
+        })
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password1 = cleaned_data.get('password1')
+        password2 = cleaned_data.get('password2')
+        
+        if password1 and password2:
+            if password1 != password2:
+                raise ValidationError('Passwords do not match.')
+            
+            # Validate password strength
+            if len(password1) < 8:
+                raise ValidationError('Password must be at least 8 characters long.')
+            
+            if password1.isdigit():
+                raise ValidationError('Password cannot be entirely numeric.')
+        
         return cleaned_data 

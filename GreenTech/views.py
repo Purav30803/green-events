@@ -26,7 +26,8 @@ from .models import Event, EventRegistration, UserProfile, Contact, VisitorCount
 from .forms import (
     UserRegistrationForm, UserLoginForm, UserProfileEditForm, ContactForm,
     EventCreationForm, EventRegistrationForm, ContactStatusUpdateForm,
-    EventSearchForm, UserSearchForm, ContactSearchForm
+    EventSearchForm, UserSearchForm, ContactSearchForm,
+    PasswordResetRequestForm, SetNewPasswordForm
 )
 
 
@@ -783,3 +784,96 @@ class UpdateContactStatusView(LoginRequiredMixin, AdminRequiredMixin, View):
             'success': False,
             'message': 'Invalid status'
         })
+
+
+# Password Reset Views
+class PasswordResetRequestView(View):
+    template_name = "GreenTech/password_reset_request.html"
+    
+    def get(self, request):
+        form = PasswordResetRequestForm()
+        return render(request, self.template_name, {'form': form})
+    
+    def post(self, request):
+        form = PasswordResetRequestForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            try:
+                user = User.objects.get(email=email)
+                
+                # Generate password reset token
+                current_site = get_current_site(request)
+                email_subject = "Reset Your Password"
+                message = render_to_string('GreenTech/password_reset_email.html', {
+                    'name': user.first_name or user.username,
+                    'domain': current_site.domain,
+                    'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                    'token': generate_token.make_token(user)
+                })
+                
+                email = EmailMessage(
+                    email_subject,
+                    message,
+                    settings.EMAIL_HOST_USER,
+                    [user.email]
+                )
+                email.content_subtype = "html"  # Set content type to HTML
+                email.fail_silently = True
+                email.send()
+                
+                messages.success(request, "Password reset link has been sent to your email address.")
+                return redirect('signin')
+                
+            except User.DoesNotExist:
+                # Don't reveal that the user doesn't exist for security
+                messages.success(request, "If an account with this email exists, a password reset link has been sent.")
+                return redirect('signin')
+        else:
+            return render(request, self.template_name, {'form': form})
+
+
+class PasswordResetConfirmView(View):
+    template_name = "GreenTech/password_reset_confirm.html"
+    
+    def get(self, request, uidb64, token):
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=uid)
+        except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+        
+        if user is not None and generate_token.check_token(user, token):
+            form = SetNewPasswordForm()
+            return render(request, self.template_name, {
+                'form': form,
+                'uidb64': uidb64,
+                'token': token
+            })
+        else:
+            messages.error(request, "The password reset link is invalid or has expired.")
+            return redirect('signin')
+    
+    def post(self, request, uidb64, token):
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=uid)
+        except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+        
+        if user is not None and generate_token.check_token(user, token):
+            form = SetNewPasswordForm(request.POST)
+            if form.is_valid():
+                password1 = form.cleaned_data['password1']
+                user.set_password(password1)
+                user.save()
+                messages.success(request, "Your password has been reset successfully. You can now sign in with your new password.")
+                return redirect('signin')
+            else:
+                return render(request, self.template_name, {
+                    'form': form,
+                    'uidb64': uidb64,
+                    'token': token
+                })
+        else:
+            messages.error(request, "The password reset link is invalid or has expired.")
+            return redirect('signin')

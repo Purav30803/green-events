@@ -17,6 +17,10 @@ urlpatterns = [
     path('signout/', views.SignoutView.as_view(), name='signout'),
     path('activate/<uidb64>/<token>', views.ActivateView.as_view(), name='activate'),
     
+    # Password Reset URLs
+    path('password-reset/', views.PasswordResetRequestView.as_view(), name='password_reset_request'),
+    path('password-reset/<uidb64>/<token>/', views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    
     # Custom Admin URLs
     path('admin/', views.AdminDashboardView.as_view(), name='admin_dashboard'),
     path('admin/events/', views.AdminEventsView.as_view(), name='admin_events'),
