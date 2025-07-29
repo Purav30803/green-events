@@ -9,7 +9,7 @@ def get_event_type_image(event_type):
     """
     # Default images for each event type
     event_type_images = {
-        'tree_planting': '/static/images/event-types/tree-planting.svg',
+        'tree_planting': '/static/images/event-types/tree_planting.svg',
         'cleanup': '/static/images/event-types/cleanup.svg',
         'recycling': '/static/images/event-types/recycling.svg',
         'education': '/static/images/event-types/education.svg',

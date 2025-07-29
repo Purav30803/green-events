@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 from django import template
+from datetime import date
 from .utils import get_event_type_image, get_event_type_icon, get_event_type_color
 
 register = template.Library()
@@ -71,6 +72,11 @@ class Event(models.Model):
     @property
     def available_spots(self):
         return self.max_participants - self.current_participants
+    
+    @property
+    def is_past_event(self):
+        """Check if the event date has passed"""
+        return self.date < date.today()
     
     def get_event_image_url(self):
         """

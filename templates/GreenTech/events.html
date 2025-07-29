@@ -75,7 +75,7 @@
             <div class="row">
                 {% for event in page_obj %}
                     <div class="col-lg-4 col-md-6 mb-4">
-                        <div class="card event-card h-100">
+                        <div class="card event-card h-100 {% if event.is_past_event %}opacity-75{% endif %}">
                             <div class="card-img-top position-relative" style="height: 200px; overflow: hidden;">
                                 {% if event.image %}
                                     <img src="{{ event.image.url }}" class="w-100 h-100" alt="{{ event.title }}" style="object-fit: cover;">
@@ -87,6 +87,13 @@
                                 <span class="badge bg-{{ event.get_event_color_class }} position-absolute top-0 end-0 m-2 event-type-badge">
                                     {{ event.get_event_type_display }}
                                 </span>
+                                
+                                <!-- Past Event Badge -->
+                                {% if event.is_past_event %}
+                                    <span class="badge bg-danger position-absolute top-0 start-0 m-2">
+                                        <i class="bi bi-calendar-x me-1"></i>Past Event
+                                    </span>
+                                {% endif %}
                             </div>
                             
                             <div class="card-body">
@@ -111,7 +118,11 @@
                                     </div>
                                 </div>
                                 
-                                {% if event.is_full %}
+                                {% if event.is_past_event %}
+                                    <div class="alert alert-danger py-2 mb-3">
+                                        <i class="bi bi-calendar-x me-2"></i>Event has passed
+                                    </div>
+                                {% elif event.is_full %}
                                     <div class="alert alert-warning py-2 mb-3">
                                         <i class="bi bi-exclamation-triangle me-2"></i>Event Full
                                     </div>

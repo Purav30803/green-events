@@ -1,0 +1,310 @@
+{% extends 'GreenTech/base.html' %}
+
+{% block title %}About Us - GreenConnect{% endblock %}
+
+{% block extra_css %}
+<style>
+    .about-hero {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 80px 0;
+    }
+    
+    .mission-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .mission-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .feature-icon {
+        font-size: 3rem;
+        color: #28a745;
+        margin-bottom: 1rem;
+    }
+    
+    .team-member {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .team-member img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 1rem;
+        border: 4px solid #28a745;
+    }
+    
+    .stats-section {
+        background-color: #f8f9fa;
+        padding: 60px 0;
+    }
+    
+    .stat-card {
+        text-align: center;
+        padding: 2rem;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #28a745;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="about-hero">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-4 fw-bold mb-4">About GreenConnect</h1>
+                <p class="lead mb-5">Connecting communities through environmental action and sustainable volunteering opportunities.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Mission Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center mb-5">
+                <h2 class="fw-bold mb-4">Our Mission</h2>
+                <p class="lead text-muted">To create a sustainable future by connecting passionate individuals with meaningful environmental initiatives and fostering a culture of community engagement.</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card mission-card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-globe feature-icon"></i>
+                        <h5 class="card-title">Environmental Impact</h5>
+                        <p class="card-text">We facilitate real environmental change through organized community events, tree planting, cleanups, and conservation efforts.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card mission-card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-people feature-icon"></i>
+                        <h5 class="card-title">Community Building</h5>
+                        <p class="card-text">We bring together like-minded individuals to create strong, sustainable communities focused on environmental stewardship.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card mission-card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-lightbulb feature-icon"></i>
+                        <h5 class="card-title">Education & Awareness</h5>
+                        <p class="card-text">We promote environmental education and raise awareness about sustainability through engaging events and workshops.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- What We Do Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center mb-5">
+                <h2 class="fw-bold mb-4">What We Do</h2>
+                <p class="lead text-muted">GreenConnect serves as a comprehensive platform for environmental activism and community engagement.</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-6 mb-4">
+                <div class="d-flex">
+                    <div class="flex-shrink-0">
+                        <i class="bi bi-calendar-event text-success" style="font-size: 2rem;"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h5>Event Management</h5>
+                        <p class="text-muted">We organize and manage various environmental events including tree planting, community cleanups, recycling drives, and educational workshops.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6 mb-4">
+                <!-- <div class="d-flex">
+                    <div class="flex-shrink-0">
+                        <i class="bi bi-person-plus text-success" style="font-size: 2rem;"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h5>Volunteer Coordination</h5>
+                        <p class="text-muted">We connect volunteers with meaningful opportunities and provide tools for event organizers to manage participants effectively.</p>
+                    </div>
+                </div> -->
+                <div class="d-flex">
+                    <div class="flex-shrink-0">
+                        <i class="bi bi-geo-alt text-success" style="font-size: 2rem;"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h5>Local Impact</h5>
+                        <p class="text-muted">We focus on local communities, making environmental action accessible and relevant to people's daily lives.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Event Types Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center mb-5">
+                <h2 class="fw-bold mb-4">Our Event Types</h2>
+                <p class="lead text-muted">We support a wide range of environmental activities to address different aspects of sustainability.</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-tree text-success" style="font-size: 3rem;"></i>
+                        <h5 class="card-title mt-3">Tree Planting</h5>
+                        <p class="card-text">Community tree planting events to increase green cover and combat climate change.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-trash text-success" style="font-size: 3rem;"></i>
+                        <h5 class="card-title mt-3">Cleanup Drives</h5>
+                        <p class="card-text">Beach, park, and neighborhood cleanup initiatives to maintain clean environments.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-recycle text-success" style="font-size: 3rem;"></i>
+                        <h5 class="card-title mt-3">Recycling Programs</h5>
+                        <p class="card-text">Waste management and recycling awareness programs to promote circular economy.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-book text-success" style="font-size: 3rem;"></i>
+                        <h5 class="card-title mt-3">Environmental Education</h5>
+                        <p class="card-text">Workshops and seminars to educate communities about environmental conservation.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-heart text-success" style="font-size: 3rem;"></i>
+                        <h5 class="card-title mt-3">Wildlife Conservation</h5>
+                        <p class="card-text">Protection and conservation efforts for local wildlife and natural habitats.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-lightbulb text-success" style="font-size: 3rem;"></i>
+                        <h5 class="card-title mt-3">Other Initiatives</h5>
+                        <p class="card-text">Innovative environmental projects and community-driven sustainability initiatives.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center mb-5">
+                <h2 class="fw-bold mb-4">Our Impact</h2>
+                <p class="lead text-muted">Together, we're making a difference in our communities and the environment.</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="stat-card">
+                    <div class="stat-number">{{ total_events|default:"100+" }}</div>
+                    <p class="text-muted">Events Organized</p>
+                </div>
+            </div>
+            
+            <!-- <div class="col-md-3 mb-4">
+                <div class="stat-card">
+                    <div class="stat-number">{{ total_participants|default:"500+" }}</div>
+                    <p class="text-muted">Volunteers Engaged</p>
+                </div>
+            </div>
+             -->
+            <div class="col-md-4 mb-4">
+                <div class="stat-card">
+                    <div class="stat-number">6</div>
+                    <p class="text-muted">Event Types</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="stat-card">
+                    <div class="stat-number">24/7</div>
+                    <p class="text-muted">Platform Availability</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="fw-bold mb-4">Get Involved</h2>
+                <p class="lead text-muted mb-5">Ready to make a difference? Join our community of environmental advocates today.</p>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <a href="{% url 'events' %}" class="btn btn-green btn-lg w-100">
+                            <i class="bi bi-calendar-event me-2"></i>Browse Events
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <a href="{% url 'signup' %}" class="btn btn-outline-success btn-lg w-100">
+                            <i class="bi bi-person-plus me-2"></i>Join Our Community
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %} 

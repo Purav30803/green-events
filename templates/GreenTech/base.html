@@ -76,7 +76,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-success">
         <div class="container">
             <a class="navbar-brand" href="{% url 'home' %}">
-                <i class="bi bi-tree-fill me-2"></i>Green Events
+                <i class="bi bi-tree-fill me-2"></i>GreenConnect
             </a>
             
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -90,6 +90,9 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'events' %}">Events</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'about' %}">About Us</a>
                     </li>
                 </ul>
                 
@@ -150,6 +153,7 @@
                     <ul class="list-unstyled">
                         <li><a href="{% url 'home' %}" class="text-light">Home</a></li>
                         <li><a href="{% url 'events' %}" class="text-light">Events</a></li>
+                        <li><a href="{% url 'about' %}" class="text-light">About Us</a></li>
                         {% if user.is_authenticated %}
                             <li><a href="{% url 'user_profile' %}" class="text-light">My Profile</a></li>
                         {% else %}
@@ -160,12 +164,12 @@
                 <div class="col-md-3">
                     <h6>Contact</h6>
                     <p class="mb-1"><i class="bi bi-envelope me-2"></i>info@greenevents.com</p>
-                    <p class="mb-1"><i class="bi bi-telephone me-2"></i>+1 (555) 123-4567</p>
+                    <p class="mb-1"><i class="bi bi-telephone me-2"></i>+1 (123) 456-7890</p>
                 </div>
             </div>
             <hr class="my-4">
             <div class="text-center">
-                <p>&copy; 2024 Green Events & Volunteering Portal. All rights reserved.</p>
+                <p>&copy; 2025 Green Events & Volunteering Portal. All rights reserved.</p>
             </div>
         </div>
     </footer>

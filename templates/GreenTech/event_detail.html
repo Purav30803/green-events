@@ -159,7 +159,11 @@
                         
                 
                         <!-- Registration Status -->
-                        {% if event.is_full %}
+                        {% if event.is_past_event %}
+                            <div class="alert alert-danger">
+                                <i class="bi bi-calendar-x me-2"></i>This event has already passed
+                            </div>
+                        {% elif event.is_full %}
                             <div class="alert alert-warning">
                                 <i class="bi bi-exclamation-triangle me-2"></i>This event is full
                             </div>
@@ -169,7 +173,7 @@
                             </div>
                             <form method="post" action="{% url 'unregister_from_event' event.id %}">
                                 {% csrf_token %}
-                                <button type="s ubmit" class="btn btn-outline-danger w-100">
+                                <button type="submit" class="btn btn-outline-danger w-100">
                                     <i class="bi bi-x-circle me-2"></i>Cancel Registration
                                 </button>
                             </form>
