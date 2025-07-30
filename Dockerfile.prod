@@ -42,4 +42,4 @@ RUN mkdir -p /app/static
 EXPOSE 8000
 
 # Run with Gunicorn for production
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "120", "Iads.wsgi:application"] 
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "Iads.wsgi:application"] 
