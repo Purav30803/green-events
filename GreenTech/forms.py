@@ -76,13 +76,22 @@ class UserRegistrationForm(UserCreationForm):
         
         if commit:
             user.save()
-            # Create UserProfile
-            UserProfile.objects.create(
-                user=user,
-                address=self.cleaned_data.get('address', ''),
-                phone_number=self.cleaned_data.get('phone_number', ''),
-                age=self.cleaned_data.get('age')
-            )
+            # UserProfile will be created automatically by the signal
+            # Update the profile with additional data
+            try:
+                profile = user.userprofile
+                profile.address = self.cleaned_data.get('address', '')
+                profile.phone_number = self.cleaned_data.get('phone_number', '')
+                profile.age = self.cleaned_data.get('age')
+                profile.save()
+            except UserProfile.DoesNotExist:
+                # Fallback if signal doesn't work
+                UserProfile.objects.create(
+                    user=user,
+                    address=self.cleaned_data.get('address', ''),
+                    phone_number=self.cleaned_data.get('phone_number', ''),
+                    age=self.cleaned_data.get('age')
+                )
         return user
 
 

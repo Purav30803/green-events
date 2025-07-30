@@ -243,10 +243,8 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        try:
-            profile = UserProfile.objects.get(user=self.request.user)
-        except UserProfile.DoesNotExist:
-            profile = UserProfile.objects.create(user=self.request.user)
+        # Get or create user profile
+        profile, created = UserProfile.objects.get_or_create(user=self.request.user)
         
         # Get user's event registrations
         registrations = EventRegistration.objects.filter(user=self.request.user).order_by('-registered_at')
@@ -264,20 +262,12 @@ class EditProfileView(LoginRequiredMixin, View):
     template_name = "GreenTech/edit_profile.html"
     
     def get(self, request):
-        try:
-            profile = UserProfile.objects.get(user=request.user)
-        except UserProfile.DoesNotExist:
-            profile = UserProfile.objects.create(user=request.user)
-        
+        profile, created = UserProfile.objects.get_or_create(user=request.user)
         form = UserProfileEditForm(instance=profile)
         return render(request, self.template_name, {'form': form, 'profile': profile})
     
     def post(self, request):
-        try:
-            profile = UserProfile.objects.get(user=request.user)
-        except UserProfile.DoesNotExist:
-            profile = UserProfile.objects.create(user=request.user)
-        
+        profile, created = UserProfile.objects.get_or_create(user=request.user)
         form = UserProfileEditForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
             form.save()
@@ -303,12 +293,21 @@ class SignupView(View):
             myuser.is_active = False
             myuser.save()
             
-            # Create user profile (already done in form.save())
-            profile = UserProfile.objects.get(user=myuser)
-            profile.address = form.cleaned_data.get('address', '')
-            profile.phone_number = form.cleaned_data.get('phone_number', '')
-            profile.age = form.cleaned_data.get('age')
-            profile.save()
+            # Update user profile with additional data
+            try:
+                profile = myuser.userprofile
+                profile.address = form.cleaned_data.get('address', '')
+                profile.phone_number = form.cleaned_data.get('phone_number', '')
+                profile.age = form.cleaned_data.get('age')
+                profile.save()
+            except UserProfile.DoesNotExist:
+                # Create UserProfile if it doesn't exist (fallback)
+                UserProfile.objects.create(
+                    user=myuser,
+                    address=form.cleaned_data.get('address', ''),
+                    phone_number=form.cleaned_data.get('phone_number', ''),
+                    age=form.cleaned_data.get('age')
+                )
 
             messages.success(request, "Your account has been successfully created. Check mail to verify.",
                              extra_tags="valid")
