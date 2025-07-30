@@ -143,7 +143,7 @@ After running the setup_admin command, you can use:
 - **Password**: admin123
 
 ## Project Structure
-
+```bash
 DjangoProject/
 ├── .git/                     # Git version control
 ├── .idea/                    # IDE configuration
@@ -234,7 +234,7 @@ DjangoProject/
 │
 └── media/                  # Uploaded files
     └── profile_pics/
-
+```
 ## Key Features Explained
 
 ### 1. **No Login Required for Browsing**
