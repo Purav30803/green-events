@@ -115,13 +115,21 @@ python manage.py migrate
 python manage.py setup_admin
 ```
 
-### 7. Run the Development Server
+### 7. Create Sample Events (Optional)
+
+To populate the system with sample events:
+
+```bash
+python manage.py create_sample_events
+```
+
+### 8. Run the Development Server
 
 ```bash
 python manage.py runserver
 ```
 
-### 8. Access the Application
+### 9. Access the Application
 
 - **Home Page**: http://127.0.0.1:8000/
 - **Admin Panel**: http://127.0.0.1:8000/admin/
@@ -136,30 +144,96 @@ After running the setup_admin command, you can use:
 
 ## Project Structure
 
-```
 DjangoProject/
-├── GreenTech/                 # Main Django app
-│   ├── models.py             # Database models
-│   ├── views.py              # View functions
-│   ├── urls.py               # URL routing
-│   ├── admin.py              # Admin interface
-│   └── management/           # Custom commands
-├── Iads/                     # Django project settings
-│   ├── settings.py           # Project configuration
-│   └── urls.py              # Main URL configuration
-├── templates/                # HTML templates
-│   └── GreenTech/
-│       ├── base.html         # Base template
-│       ├── home.html         # Home page
-│       ├── events.html       # Events listing
-│       ├── event_detail.html # Event details
-│       ├── signin.html       # Login page
-│       ├── signup.html       # Registration page
-│       ├── user_profile.html # User profile
-│       └── edit_profile.html # Edit profile
-├── static/                   # Static files
-└── media/                    # Uploaded files
-```
+├── .git/                     # Git version control
+├── .idea/                    # IDE configuration
+├── .venv/                    # Python virtual environment
+├── .gitignore                # Git ignore file
+├── requirements.txt           # Python dependencies
+├── manage.py                 # Django management script
+├── db.sqlite3               # SQLite database
+├── README.md                # Project documentation
+├── ADMIN_SETUP.md           # Admin setup instructions
+│
+├── Iads/                    # Django project settings
+│   ├── __init__.py
+│   ├── asgi.py             # ASGI configuration
+│   ├── settings.py         # Project configuration
+│   ├── tokens.py           # Email token generation
+│   ├── urls.py            # Main URL configuration
+│   └── wsgi.py            # WSGI configuration
+│
+├── GreenTech/              # Main Django app
+│   ├── __init__.py
+│   ├── admin.py           # Admin interface configuration
+│   ├── apps.py            # App configuration
+│   ├── decorators.py      # Custom decorators
+│   ├── forms.py           # Django forms (12 forms)
+│   ├── models.py          # Database models (5 models)
+│   ├── tests.py           # Unit tests
+│   ├── urls.py            # URL routing
+│   ├── utils.py           # Utility functions
+│   ├── views.py           # View classes (28 views)
+│   │
+│   ├── migrations/        # Database migrations
+│   │   ├── __init__.py
+│   │   ├── 0001_initial.py
+│   │   ├── 0002_event_eventregistration_userprofile_and_more.py
+│   │   ├── 0003_contact.py
+│   │   ├── 0004_contact_event_fields.py
+│   │   └── 0005_visitorcount.py
+│   │
+│   └── management/        # Custom management commands
+│       ├── __init__.py
+│       └── commands/
+│           ├── __init__.py
+│           ├── create_sample_events.py
+│           ├── init_visitor_count.py
+│           └── setup_admin.py
+│
+├── templates/              # HTML templates
+│   ├── activation_failed.html
+│   ├── email_confirmation.html
+│   └── GreenTech/         # App-specific templates (24 templates)
+│       ├── about.html
+│       ├── account.html
+│       ├── admin_contact_detail.html
+│       ├── admin_contacts.html
+│       ├── admin_create_event.html
+│       ├── admin_dashboard.html
+│       ├── admin_event_detail.html
+│       ├── admin_events.html
+│       ├── admin_nav.html
+│       ├── admin_registrations.html
+│       ├── admin_users.html
+│       ├── base.html
+│       ├── contact.html
+│       ├── edit_profile.html
+│       ├── event_detail.html
+│       ├── events.html
+│       ├── home.html
+│       ├── password_reset_confirm.html
+│       ├── password_reset_email.html
+│       ├── password_reset_request.html
+│       ├── signin.html
+│       ├── signup.html
+│       └── user_profile.html
+│
+├── static/                 # Static files
+│   ├── css/
+│   │   ├── dash.css
+│   │   └── style.css
+│   └── images/
+│       └── event-types/
+│           ├── cleanup.svg
+│           ├── conservation.svg
+│           ├── education.svg
+│           ├── other.svg
+│           ├── recycling.svg
+│           └── tree_planting.svg
+│
+└── media/                  # Uploaded files
+    └── profile_pics/
 
 ## Key Features Explained
 
