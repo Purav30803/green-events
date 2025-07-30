@@ -135,6 +135,83 @@ python manage.py runserver
 - **Admin Panel**: http://127.0.0.1:8000/admin/
 - **Events**: http://127.0.0.1:8000/events/
 
+## Docker Deployment
+
+### Prerequisites
+
+- Docker
+- Docker Compose
+
+### Environment Variables
+
+Create a `.env` file in the project root with your configuration:
+
+```bash
+# Django Settings
+DEBUG=True
+SECRET_KEY=your-secret-key-change-this-in-production
+DJANGO_SETTINGS_MODULE=Iads.settings
+
+# Email Configuration
+EMAIL_HOST=smtp.example.com
+EMAIL_PORT=587
+EMAIL_HOST_USER=abc@def.com
+EMAIL_HOST_PASSWORD=your-app-password
+EMAIL_USE_TLS=True
+
+# Database Configuration
+DB_ENGINE=django.db.backends.postgresql
+DB_NAME=greentech_db
+DB_USER=greentech_user
+DB_PASSWORD=your-database-password
+DB_HOST=localhost
+DB_PORT=5432
+```
+
+### 1. Build and Run with Docker Compose
+
+```bash
+# Build and start all services
+docker-compose up --build
+
+# Run in background
+docker-compose up -d --build
+```
+
+### 2. Access the Application
+
+- **Home Page**: http://localhost:8000/
+- **Admin Panel**: http://localhost:8000/admin/
+- **Events**: http://localhost:8000/events/
+
+### 3. Docker Commands
+
+```bash
+# View logs
+docker-compose logs
+
+# Stop services
+docker-compose down
+
+# Remove volumes (will delete database)
+docker-compose down -v
+
+# Rebuild without cache
+docker-compose build --no-cache
+
+# Access Django shell
+docker-compose exec web python manage.py shell
+
+# Create superuser
+docker-compose exec web python manage.py createsuperuser
+
+# Run migrations
+docker-compose exec web python manage.py migrate
+
+# Collect static files
+docker-compose exec web python manage.py collectstatic
+```
+
 ## Default Credentials
 
 After running the setup_admin command, you can use:
@@ -143,6 +220,7 @@ After running the setup_admin command, you can use:
 - **Password**: admin123
 
 ## Project Structure
+
 ```bash
 DjangoProject/
 ├── .git/                     # Git version control
@@ -235,6 +313,7 @@ DjangoProject/
 └── media/                  # Uploaded files
     └── profile_pics/
 ```
+
 ## Key Features Explained
 
 ### 1. **No Login Required for Browsing**
