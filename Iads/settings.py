@@ -36,7 +36,7 @@ SECRET_KEY = 'django-insecure-yadbu+ep8_nn14@6s2b08guztb6xm@8_x0p4!#hj(z&!ut9hk2
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'https://green-events-541288155610.europe-west1.run.app/',
+    'green-events-541288155610.europe-west1.run.app',
 ]
 
 
